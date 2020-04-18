@@ -1,0 +1,19 @@
+name: local
+
+spring:
+  profiles: local
+  datasource:
+    platform: postgres
+    url: "jdbc:postgresql://localhost:5432/kosic"
+    username: rackdon
+    password: rackdon
+    jpa:
+      show-sql: true
+      generate-ddl: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: info

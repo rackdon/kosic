@@ -1,0 +1,25 @@
+name: test
+
+spring:
+  profiles:
+    active: test
+  datasource:
+    platform: postgres
+    url: "jdbc:postgresql://localhost:5432/kosic_test"
+    username: rackdon
+    password: rackdon
+    jpa:
+      show-sql: true
+      generate-ddl: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: info
+
+info:
+  app:
+    name: 'Kosic service'
+    description: 'Spring boot example'

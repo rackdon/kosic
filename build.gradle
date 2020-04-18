@@ -1,0 +1,256 @@
+import org.yaml.snakeyaml.Yaml
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	ext {
+		snakeyaml_version = "1.26"
+	}
+	dependencies {
+		classpath("org.yaml:snakeyaml:$snakeyaml_version")
+	}
+}
+
+plugins {
+	id "org.springframework.boot"  version "2.2.6.RELEASE"
+	id "io.spring.dependency-management"  version "1.0.9.RELEASE"
+	id 'org.jetbrains.kotlin.plugin.spring' version "1.3.72"
+	id 'org.jetbrains.kotlin.jvm' version "1.3.72"
+	id 'org.liquibase.gradle' version '2.0.2'
+	id 'org.jmailen.kotlinter' version '2.3.2'
+}
+
+apply plugin: 'kotlin-kapt'
+
+group = "rackdon"
+version = "0.0.1-SNAPSHOT"
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+	mavenCentral()
+	jcenter()
+	maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+}
+
+sourceSets {
+	integrationTest {
+		kotlin {
+			compileClasspath += main.output
+			runtimeClasspath += main.output
+		}
+		resources.srcDir file('src/integrationTest/resources')
+	}
+}
+
+configurations {
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
+	liquibaseRuntime.extendsFrom runtime
+}
+
+kotlinter {
+	disabledRules = ["parameter-list-wrapping", "no-unit-return"]
+}
+lintKotlinIntegrationTest.shouldRunAfter(lintKotlinMain)
+
+def kotlintest_version = "3.4.2"
+def arrow_version = "0.10.5"
+def logback_version = "1.2.3"
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+
+	// Arrow
+	implementation "io.arrow-kt:arrow-fx:$arrow_version"
+	implementation "io.arrow-kt:arrow-fx-kotlinx-coroutines:$arrow_version"
+	implementation "io.arrow-kt:arrow-syntax:$arrow_version"
+	kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+
+	// PostgreSQL
+	implementation 'org.postgresql:postgresql'
+	implementation 'com.vladmihalcea:hibernate-types-52:2.9.7'
+
+	// Jackson
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+
+	// Sentry
+	implementation 'io.sentry:sentry-logback:1.7.30'
+
+	// Open Api
+	implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.3.2'
+
+	// Liquibase
+	liquibaseRuntime 'org.liquibase:liquibase-core:3.8.8'
+	liquibaseRuntime "ch.qos.logback:logback-core:$logback_version"
+	liquibaseRuntime "ch.qos.logback:logback-classic:$logback_version"
+	liquibaseRuntime 'org.postgresql:postgresql'
+	liquibaseRuntime "org.yaml:snakeyaml:$snakeyaml_version"
+
+	// Test
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude module: 'mockito-core'
+	}
+	testImplementation 'com.ninja-squad:springmockk:2.0.0'
+	testImplementation 'io.mockk:mockk:1.9.3'
+	testImplementation "io.kotlintest:kotlintest-extensions-spring:$kotlintest_version"
+	testImplementation("io.kotlintest:kotlintest-runner-junit5:$kotlintest_version") {
+		exclude group: 'io.arrow-kt'
+	}
+	testImplementation("io.kotlintest:kotlintest-assertions-arrow:$kotlintest_version") {
+		exclude group: 'io.arrow-kt'
+	}
+}
+
+compileKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict',  // Add null safety
+							'-Xopt-in=kotlin.ExperimentalUnsignedTypes']
+		jvmTarget = '1.8'
+	}
+}
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict',  // Add null safety
+							'-Xopt-in=kotlin.ExperimentalUnsignedTypes']
+		jvmTarget = '1.8'
+	}
+}
+compileIntegrationTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict',  // Add null safety
+							'-Xopt-in=kotlin.ExperimentalUnsignedTypes']
+		jvmTarget = '1.8'
+	}
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		exceptionFormat = 'full'
+		events 'FAILED', 'SKIPPED', 'PASSED'
+		afterSuite { desc, result ->
+			if (!desc.parent) {
+				println "\nTest result: ${result.resultType}"
+				println "Test summary: ${result.testCount} tests, " +
+						"${result.successfulTestCount} succeeded, " +
+						"${result.failedTestCount} failed, " +
+						"${result.skippedTestCount} skipped"
+			}
+		}
+	}
+}
+
+tasks.register("integrationTest", Test) {
+	useJUnitPlatform()
+	description = 'Runs the integration tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	outputs.upToDateWhen { false }
+	testLogging {
+		exceptionFormat = 'full'
+		events 'FAILED', 'SKIPPED', 'PASSED'
+		afterSuite { desc, result ->
+			if (!desc.parent) {
+				println "\nIntegration Test result: ${result.resultType}"
+				println "Test summary: ${result.testCount} tests, " +
+						"${result.successfulTestCount} succeeded, " +
+						"${result.failedTestCount} failed, " +
+						"${result.skippedTestCount} skipped"
+			}
+		}
+	}
+}
+
+tasks.register("allTest", Test) {
+	description = 'Runs all the existing tests.'
+	group = 'verification'
+	integrationTest.shouldRunAfter(test)
+	dependsOn test, integrationTest
+}
+
+def liquibaseDir = "$projectDir/src/main/resources/liquibase/"
+def changeLog = "${liquibaseDir}changelog.yml"
+
+tasks.register("db") {
+	group = "db migrations"
+	doLast{
+		if (!project.hasProperty('database')) {
+			throw new GradleException("Please specify the database to apply through -Pdatabase=the-database")
+		}
+		String finalUrl
+		String finalUsername
+		String finalPassword
+		Map<String, Object> properties = [:]
+		Yaml yaml = new Yaml()
+		switch (database) {
+			case "local":
+				InputStream input = new FileInputStream(file("$projectDir/src/main/resources/application-local.yml"))
+				for (Object data : yaml.loadAll(input)) {
+					properties = (Map<String, Object>) data
+				}
+
+				finalUrl = properties.get("spring").get("datasource").get("url")
+				finalUsername = properties.get("spring").get("datasource").get("username")
+				finalPassword = properties.get("spring").get("datasource").get("password")
+				break
+			case "test":
+				InputStream input = new FileInputStream(file("$projectDir/src/integrationTest/resources/application.yml"))
+				for (Object data : yaml.loadAll(input)) {
+					properties = (Map<String, Object>) data
+				}
+
+				finalUrl = properties.get("spring").get("datasource").get("url")
+				finalUsername = properties.get("spring").get("datasource").get("username")
+				finalPassword = properties.get("spring").get("datasource").get("password")
+				break
+			case "prod":
+				finalUrl = System.getProperty("spring.datasource.url")
+				finalUsername = System.getProperty("spring.datasource.username")
+				finalPassword = System.getProperty("spring.datasource.password")
+				break
+			default: throw new GradleException('Invalid database param. Should be local, test or prod')
+		}
+		liquibase {
+			activities {
+				main {
+					changeLogFile changeLog
+					url finalUrl
+					username finalUsername
+					password finalPassword
+				}
+			}
+		}
+	}
+}
+
+tasks.register("newDbMigration") {
+	group = "db migrations"
+	doLast{
+		if (!project.hasProperty('migrationName')) {
+			throw new GradleException("Please specify the migration name through -PmigrationName=the-name")
+		}
+		def filesDir = "src/main/resources/liquibase/migrations/"
+		def newId
+		def files =  fileTree(filesDir).filter { it.isFile() }.files.name
+		if (files.isEmpty())
+			newId = 1
+		else
+			newId = files.last().split(/\./).first().toInteger()+1
+
+		def fileName = String.format("%s%s.%s.sql", filesDir, newId, migrationName)
+
+		file(changeLog).append("  - include:\n      file: $fileName")
+
+		file("$fileName") << file("${liquibaseDir}migration-template.sql").text.replace("migrationId", "$newId")
+
+		println "New migration file created in: $fileName"
+	}
+}
