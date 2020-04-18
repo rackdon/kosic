@@ -14,7 +14,7 @@ create table if not exists groups (
 create table if not exists albums (
     id uuid default uuid_generate_v4() not null primary key,
     group_id uuid not null,
-    name text unique not null,
+    name text not null,
     created_on timestamp without time zone not null,
     constraint album_group_fk foreign key (group_id) references groups(id)
     on delete no action on update no action
@@ -23,7 +23,7 @@ create table if not exists albums (
 create table if not exists songs (
     id uuid default uuid_generate_v4() not null primary key,
     album_id uuid not null,
-    name text unique not null,
+    name text not null,
     duration int not null,
     created_on timestamp without time zone not null,
     meta jsonb,
