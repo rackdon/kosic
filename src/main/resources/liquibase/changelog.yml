@@ -1,1 +1,3 @@
 databaseChangeLog:
+  - include:
+      file: src/main/resources/liquibase/migrations/1.init-tables.sql
