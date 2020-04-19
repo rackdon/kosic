@@ -1,8 +1,7 @@
 package io.kotlintest.provided
 
-import io.kotlintest.AbstractProjectConfig
-import io.kotlintest.extensions.ProjectLevelExtension
-import io.kotlintest.spring.SpringAutowireConstructorExtension
+import io.kotest.core.config.AbstractProjectConfig
+import io.kotest.spring.SpringAutowireConstructorExtension
 
 /**
  * From the documentation, this class and package is to have constructor injection during test
@@ -11,5 +10,5 @@ import io.kotlintest.spring.SpringAutowireConstructorExtension
  * configuration defined there when executing tests.
  * **/
 class ProjectConfig : AbstractProjectConfig() {
-    override fun extensions(): List<ProjectLevelExtension> = listOf(SpringAutowireConstructorExtension)
+    override fun extensions()  = listOf(SpringAutowireConstructorExtension)
 }
