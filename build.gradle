@@ -51,7 +51,7 @@ configurations {
 }
 
 kotlinter {
-	disabledRules = ["parameter-list-wrapping", "no-unit-return"]
+	disabledRules = ["parameter-list-wrapping", "no-unit-return", "import-ordering"]
 }
 lintKotlinIntegrationTest.shouldRunAfter(lintKotlinMain)
 
