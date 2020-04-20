@@ -31,6 +31,8 @@ repositories {
 	mavenCentral()
 	jcenter()
 	maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+	// Used for kotest intellij plugin only
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 sourceSets {
@@ -104,6 +106,8 @@ dependencies {
 	testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotest_version"
 	testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
 	testImplementation "io.kotest:kotest-property-jvm:$kotest_version"
+	// Used for kotest intellij plugin only
+	testImplementation 'io.kotest:kotest-runner-console-jvm:4.1.0.251-SNAPSHOT'
 }
 
 compileKotlin {
