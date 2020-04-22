@@ -37,21 +37,21 @@ class AlbumRepositoryJpa(private val albumJpa: AlbumJpa, private val groupJpa: G
         return PageRequest.of(page.value.toInt(), pageSize.value.toInt(), finalSort)
     }
 
-    private fun getTransformer(projection: KClass<out Album>): (planEntityJpa: AlbumEntityJpa) -> Album {
-        return { planJpa -> when (projection) {
-            AlbumRaw::class -> AlbumEntityJpa.toModelRaw(planJpa)
-            AlbumWithGroup::class -> AlbumEntityJpa.toModelWithGroup(planJpa)
-            else -> AlbumEntityJpa.toModelBase(planJpa)
+    private fun getTransformer(projection: KClass<out Album>): (albumEntityJpa: AlbumEntityJpa) -> Album {
+        return { albumJpa -> when (projection) {
+            AlbumRaw::class -> AlbumEntityJpa.toModelRaw(albumJpa)
+            AlbumWithGroup::class -> AlbumEntityJpa.toModelWithGroup(albumJpa)
+            else -> AlbumEntityJpa.toModelBase(albumJpa)
         }
         }
     }
 
-    override fun save(planCreation: AlbumCreation): IO<AlbumRaw> {
+    override fun save(albumCreation: AlbumCreation): IO<AlbumRaw> {
         return IO {
-            val planGroupJpa = groupJpa.findById(planCreation.groupId)
-            planGroupJpa.map {
-                val plan = albumJpa.save(AlbumEntityJpa.fromCreation(planCreation, it))
-                AlbumEntityJpa.toModelRaw(plan)
+            val groupJpa = groupJpa.findById(albumCreation.groupId)
+            groupJpa.map {
+                val album = albumJpa.save(AlbumEntityJpa.fromCreation(albumCreation, it))
+                AlbumEntityJpa.toModelRaw(album)
             }.orElseThrow { GroupNotFound }
         }
     }

@@ -89,10 +89,10 @@ class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) :
         }
 
         "find by name return correct group" {
-            val planGroup = factory.insertGroup()
-            val result = groupRepositoryJpa.findByName(planGroup.name, GroupRaw::class).unsafeRunSync()
+            val group = factory.insertGroup()
+            val result = groupRepositoryJpa.findByName(group.name, GroupRaw::class).unsafeRunSync()
 
-            result shouldBe Some(GroupEntityJpa.toModelRaw(planGroup))
+            result shouldBe Some(GroupEntityJpa.toModelRaw(group))
         }
 
         "find by name return None if not exists" {

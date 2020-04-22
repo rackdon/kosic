@@ -11,7 +11,7 @@ import java.util.UUID
 import kotlin.reflect.KClass
 
 interface AlbumRepository<T> {
-    fun save(planCreation: AlbumCreation): Kind<T, Album>
+    fun save(albumCreation: AlbumCreation): Kind<T, Album>
     fun findAll(projection: KClass<out Album>, page: Page = Page(), pageSize: PageSize = PageSize(),
             sort: List<String> = emptyList(), sortDir: SortDir = SortDir.DESC): Kind<T, Iterable<Album>>
     fun findById(id: UUID, projection: KClass<out Album>): Kind<T, Option<Album>>
