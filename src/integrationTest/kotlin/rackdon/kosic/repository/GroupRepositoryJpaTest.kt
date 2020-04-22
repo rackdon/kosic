@@ -24,13 +24,13 @@ import javax.persistence.EntityManager
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(false)
 @DataJpaTest
-class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa): StringSpec() {
+class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) : StringSpec() {
     override fun listeners() = listOf(SpringListener)
 
     private val groupRepositoryJpa = GroupRepositoryJpa(groupJpa)
     private val databaseCleaner = DatabaseCleanerPsql(entityManager)
-    val generator = Generator()
-    val factory = FactoryJpa(entityManager)
+    private val generator = Generator()
+    private val factory = FactoryJpa(entityManager)
 
     override fun beforeTest(testCase: TestCase) {
         databaseCleaner.truncate()

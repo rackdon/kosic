@@ -5,8 +5,8 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.localDateTime
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
+import io.kotest.property.arbitrary.single
 import io.kotest.property.arbitrary.string
-import io.kotest.property.arbitrary.take
 import io.kotest.property.arbitrary.uuid
 import rackdon.kosic.model.AlbumCreation
 import rackdon.kosic.model.AlbumRaw
@@ -19,57 +19,57 @@ import java.util.UUID
 
 class Generator {
 
-    inline fun <reified T>T.orNull(): T? {
-       return if (Arb.bool().take(1).first()) this else null
+    private inline fun <reified T> T.orNull(): T? {
+        return if (Arb.bool().single()) this else null
     }
 
     fun generateGroupCreation(
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            members: UInt = Arb.positiveInts(32767).take(1).first().toUInt(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first(),
-            dissolvedOn: LocalDateTime? = Arb.localDateTime().take(1).first().orNull()) =
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            members: UInt = Arb.positiveInts(32767).single().toUInt(),
+            createdOn: LocalDateTime = Arb.localDateTime().single(),
+            dissolvedOn: LocalDateTime? = Arb.localDateTime().single().orNull()) =
         GroupCreation(name = name, members = members, createdOn = createdOn, dissolvedOn = dissolvedOn)
 
     fun generateGroupRaw(
-            id: UUID = Arb.uuid().take(1).first(),
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            members: UInt = Arb.positiveInts().take(1).first().toUInt(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first(),
-            dissolvedOn: LocalDateTime? = Arb.localDateTime().take(1).first().orNull()
+            id: UUID = Arb.uuid().single(),
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            members: UInt = Arb.positiveInts().single().toUInt(),
+            createdOn: LocalDateTime = Arb.localDateTime().single(),
+            dissolvedOn: LocalDateTime? = Arb.localDateTime().single().orNull()
     ) =
         GroupRaw(id = id, name = name, members = members, createdOn = createdOn, dissolvedOn = dissolvedOn)
 
     fun generateAlbumCreation(
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            groupId: UUID = Arb.uuid().take(1).first(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first()
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            groupId: UUID = Arb.uuid().single(),
+            createdOn: LocalDateTime = Arb.localDateTime().single()
     ) =
         AlbumCreation(name = name, groupId = groupId, createdOn = createdOn)
 
     fun generateAlbumRaw(
-            id: UUID = Arb.uuid().take(1).first(),
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            groupId: UUID = Arb.uuid().take(1).first(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first()
+            id: UUID = Arb.uuid().single(),
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            groupId: UUID = Arb.uuid().single(),
+            createdOn: LocalDateTime = Arb.localDateTime().single()
     ) =
         AlbumRaw(id = id, name = name, groupId = groupId, createdOn = createdOn)
 
     fun generateSongCreation(
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            albumId: UUID = Arb.uuid().take(1).first(),
-            duration: UInt = Arb.positiveInts().take(1).first().toUInt(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first(),
-            meta: Map<String, Any> = Arb.map(Arb.string(STRING_LIMIT), Arb.string(STRING_LIMIT), MAP_LIMIT).take(1).first()
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            albumId: UUID = Arb.uuid().single(),
+            duration: UInt = Arb.positiveInts().single().toUInt(),
+            createdOn: LocalDateTime = Arb.localDateTime().single(),
+            meta: Map<String, Any> = Arb.map(Arb.string(STRING_LIMIT), Arb.string(STRING_LIMIT), MAP_LIMIT).single()
     ) =
         SongCreation(name = name, albumId = albumId, duration = duration, createdOn = createdOn, meta = meta)
 
     fun generateSongRaw(
-            id: UUID = Arb.uuid().take(1).first(),
-            name: String = Arb.string(1, STRING_LIMIT).take(1).first(),
-            albumId: UUID = Arb.uuid().take(1).first(),
-            duration: UInt = Arb.positiveInts().take(1).first().toUInt(),
-            createdOn: LocalDateTime = Arb.localDateTime().take(1).first(),
-            meta: Map<String, Any> = Arb.map(Arb.string(STRING_LIMIT), Arb.string(STRING_LIMIT), MAP_LIMIT).take(1).first()
+            id: UUID = Arb.uuid().single(),
+            name: String = Arb.string(1, STRING_LIMIT).single(),
+            albumId: UUID = Arb.uuid().single(),
+            duration: UInt = Arb.positiveInts().single().toUInt(),
+            createdOn: LocalDateTime = Arb.localDateTime().single(),
+            meta: Map<String, Any> = Arb.map(Arb.string(STRING_LIMIT), Arb.string(STRING_LIMIT), MAP_LIMIT).single()
     ) =
         SongRaw(id = id, name = name, albumId = albumId, duration = duration, createdOn = createdOn, meta = meta)
 

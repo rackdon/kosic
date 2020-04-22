@@ -39,7 +39,7 @@ class FactoryJpa(private val entityManager: EntityManager) : Factory {
 
     override fun insertGroup(groupCreation: GroupCreation?): GroupEntityJpa {
         val groupEntityJpa = GroupEntityJpa.fromCreation(groupCreation ?: generator.generateGroupCreation())
-        return insert(groupEntityJpa )
+        return insert(groupEntityJpa)
     }
 
     override fun insertAlbum(albumCreation: AlbumCreation?, group: GroupRaw?): AlbumEntityJpa {

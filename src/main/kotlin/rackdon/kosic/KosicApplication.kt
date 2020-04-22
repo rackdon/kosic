@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class KosicApplication
 
 fun main(args: Array<String>) {
-	runApplication<KosicApplication>(*args)
+    runApplication<KosicApplication>(*args)
 }

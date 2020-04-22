@@ -10,5 +10,5 @@ import io.kotest.spring.SpringAutowireConstructorExtension
  * configuration defined there when executing tests.
  * **/
 class ProjectConfig : AbstractProjectConfig() {
-    override fun extensions()  = listOf(SpringAutowireConstructorExtension)
+    override fun extensions() = listOf(SpringAutowireConstructorExtension)
 }

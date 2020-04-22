@@ -12,7 +12,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "groups")
-data class GroupEntityJpa (
+data class GroupEntityJpa(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         val id: UUID = UUID.randomUUID(),
