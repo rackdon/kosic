@@ -20,6 +20,8 @@ interface SongRepository<T> {
             sort: List<String> = emptyList(), sortDir: SortDir = SortDir.DESC): Kind<T, Iterable<Song>>
     fun findByAlbumName(albumName: String, projection: KClass<out Song>, page: Page = Page(), pageSize: PageSize = PageSize(),
             sort: List<String> = emptyList(), sortDir: SortDir = SortDir.DESC): Kind<T, Iterable<Song>>
-
-    // TODO find by group id and group name
+    fun findByGroupId(groupId: UUID, projection: KClass<out Song>, page: Page = Page(), pageSize: PageSize = PageSize(),
+            sort: List<String> = emptyList(), sortDir: SortDir = SortDir.DESC): Kind<T, Iterable<Song>>
+    fun findByGroupName(groupName: String, projection: KClass<out Song>, page: Page = Page(), pageSize: PageSize = PageSize(),
+            sort: List<String> = emptyList(), sortDir: SortDir = SortDir.DESC): Kind<T, Iterable<Song>>
 }

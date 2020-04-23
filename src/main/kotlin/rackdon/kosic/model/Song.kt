@@ -42,3 +42,13 @@ data class SongWithAlbum(
         override val createdOn: LocalDateTime,
         override val meta: Map<String, Any>
 ) : Song()
+
+data class SongWithAlbumAndGroup(
+        val id: UUID,
+        override val name: String,
+        val album: Album,
+        val group: Group,
+        override val duration: UInt,
+        override val createdOn: LocalDateTime,
+        override val meta: Map<String, Any>
+) : Song()

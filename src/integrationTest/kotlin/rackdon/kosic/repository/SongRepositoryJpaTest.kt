@@ -16,9 +16,11 @@ import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SongWithAlbum
 import rackdon.kosic.model.AlbumNotFound
+import rackdon.kosic.model.SongWithAlbumAndGroup
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.SongEntityJpa
 import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
+import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
 import rackdon.kosic.utils.FactoryJpa
 import rackdon.kosic.utils.Generator
@@ -184,6 +186,67 @@ class SongRepositoryJpaTest(entityManager: EntityManager, songJpa: SongJpa, albu
                     sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelRaw(it) }
+        }
+
+        "find by group id" {
+            val song1 = factory.insertSong()
+            factory.insertSong()
+            val result = songRepositoryJpa.findByGroupId(song1.album.group.id, SongWithAlbumAndGroup::class).unsafeRunSync()
+
+            result.content shouldBe listOf(SongEntityJpa.toModelWithAlbumAndGroup(song1))
+        }
+        "find by group id sorted by song name with default direction" {
+            val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
+            val song1 = factory.insertSong(generator.generateSongCreation(name = "a"), album)
+            val song2 = factory.insertSong(generator.generateSongCreation(name = "b"), album)
+            factory.insertSong(generator.generateSongCreation())
+            val result = songRepositoryJpa.findByGroupId(album.groupId, SongWithAlbumAndGroup::class,
+                    sort = listOf("name")).unsafeRunSync()
+
+            result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
+        }
+
+        "find by group id sorted by song name with asc direction" {
+            val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
+            val song1 = factory.insertSong(generator.generateSongCreation(name = "a"), album)
+            val song2 = factory.insertSong(generator.generateSongCreation(name = "b"), album)
+            factory.insertSong(generator.generateSongCreation())
+            val result = songRepositoryJpa.findByGroupId(album.groupId, SongWithAlbumAndGroup::class,
+                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+
+            result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
+        }
+
+        "find by group name" {
+            val song1 = factory.insertSong()
+            factory.insertSong()
+            val result = songRepositoryJpa.findByGroupName(song1.album.group.name, SongWithAlbumAndGroup::class).unsafeRunSync()
+
+            result.content shouldBe listOf(SongEntityJpa.toModelWithAlbumAndGroup(song1))
+        }
+
+        "find by group name sorted by song name with default direction" {
+            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(group = group))
+            val song1 = factory.insertSong(generator.generateSongCreation(name = "a"), album)
+            val song2 = factory.insertSong(generator.generateSongCreation(name = "b"), album)
+            factory.insertSong(generator.generateSongCreation())
+            val result = songRepositoryJpa.findByGroupName(group.name, SongWithAlbumAndGroup::class,
+                    sort = listOf("name")).unsafeRunSync()
+
+            result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
+        }
+
+        "find by group name sorted by song name with asc direction" {
+            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(group = group))
+            val song1 = factory.insertSong(generator.generateSongCreation(name = "a"), album)
+            val song2 = factory.insertSong(generator.generateSongCreation(name = "b"), album)
+            factory.insertSong(generator.generateSongCreation())
+            val result = songRepositoryJpa.findByGroupName(group.name, SongWithAlbumAndGroup::class,
+                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+
+            result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
         }
     }
 }

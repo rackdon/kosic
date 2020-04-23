@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.AlbumNotFound
 import rackdon.kosic.model.PageSize
@@ -15,6 +16,7 @@ import rackdon.kosic.model.Song
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SongWithAlbum
+import rackdon.kosic.model.SongWithAlbumAndGroup
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.SongEntityJpa
 import java.util.Optional
@@ -26,6 +28,10 @@ interface SongJpa : JpaRepository<SongEntityJpa, UUID> {
     fun findByName(name: String): Optional<SongEntityJpa>
     fun findByAlbumId(albumId: UUID, pageRequest: Pageable): Page<SongEntityJpa>
     fun findByAlbumName(albumName: String, pageRequest: Pageable): Page<SongEntityJpa>
+    @Query("SELECT s from SongEntityJpa s WHERE s.album.group.id = ?1")
+    fun findByGroupId(groupId: UUID, pageRequest: Pageable): Page<SongEntityJpa>
+    @Query("SELECT s from SongEntityJpa s WHERE s.album.group.name = ?1")
+    fun findByGroupName(groupName: String, pageRequest: Pageable): Page<SongEntityJpa>
 }
 
 @Repository
@@ -40,6 +46,7 @@ class SongRepositoryJpa(private val songJpa: SongJpa, private val albumJpa: Albu
         return { songJpa -> when (projection) {
             SongRaw::class -> SongEntityJpa.toModelRaw(songJpa)
             SongWithAlbum::class -> SongEntityJpa.toModelWithAlbum(songJpa)
+            SongWithAlbumAndGroup::class -> SongEntityJpa.toModelWithAlbumAndGroup(songJpa)
             else -> SongEntityJpa.toModelBase(songJpa)
         }
         }
@@ -86,5 +93,20 @@ class SongRepositoryJpa(private val songJpa: SongJpa, private val albumJpa: Albu
         val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
         val finalProjection = getTransformer(projection)
         return IO { songJpa.findByAlbumName(albumName, pageRequest).map { finalProjection(it) } }
+    }
+
+    override fun findByGroupId(groupId: UUID, projection: KClass<out Song>, page: rackdon.kosic.model.Page, pageSize: PageSize,
+            sort: List<String>, sortDir: SortDir
+    ): IO<Page<out Song>> {
+        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val transformer = getTransformer(projection)
+        return IO { songJpa.findByGroupId(groupId, pageRequest).map { transformer(it) } }
+    }
+    override fun findByGroupName(groupName: String, projection: KClass<out Song>, page: rackdon.kosic.model.Page, pageSize: PageSize,
+            sort: List<String>, sortDir: SortDir
+    ): IO<Page<out Song>> {
+        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val finalProjection = getTransformer(projection)
+        return IO { songJpa.findByGroupName(groupName, pageRequest).map { finalProjection(it) } }
     }
 }

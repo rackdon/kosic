@@ -7,6 +7,7 @@ import rackdon.kosic.model.SongBase
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SongWithAlbum
+import rackdon.kosic.model.SongWithAlbumAndGroup
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Entity
@@ -67,6 +68,16 @@ data class SongEntityJpa(
                     id = songEntityJpa.id,
                     name = songEntityJpa.name,
                     album = AlbumEntityJpa.toModelRaw(songEntityJpa.album),
+                    duration = songEntityJpa.duration.toUInt(),
+                    createdOn = songEntityJpa.createdOn,
+                    meta = songEntityJpa.meta)
+
+        fun toModelWithAlbumAndGroup(songEntityJpa: SongEntityJpa) =
+            SongWithAlbumAndGroup(
+                    id = songEntityJpa.id,
+                    name = songEntityJpa.name,
+                    album = AlbumEntityJpa.toModelRaw(songEntityJpa.album),
+                    group = GroupEntityJpa.toModelRaw(songEntityJpa.album.group),
                     duration = songEntityJpa.duration.toUInt(),
                     createdOn = songEntityJpa.createdOn,
                     meta = songEntityJpa.meta)
