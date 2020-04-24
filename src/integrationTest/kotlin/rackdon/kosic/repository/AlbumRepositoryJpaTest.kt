@@ -7,6 +7,8 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.single
 import io.kotest.spring.SpringListener
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -21,7 +23,8 @@ import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
 import rackdon.kosic.utils.FactoryJpa
-import rackdon.kosic.utils.Generator
+import rackdon.kosic.utils.generator.albumCreation
+import rackdon.kosic.utils.generator.groupCreation
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.EntityManager
@@ -34,7 +37,6 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
 
     private val albumRepositoryJpa = AlbumRepositoryJpa(albumJpa, groupJpa)
     private val databaseCleaner = DatabaseCleanerPsql(entityManager)
-    private val generator = Generator()
     private val factory = FactoryJpa(entityManager)
 
     override fun beforeTest(testCase: TestCase) {
@@ -80,8 +82,8 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
 
         "find all albums sorted by name with default direction and album base projection" {
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
 
             val result = albumRepositoryJpa.findAll(AlbumBase::class, sort = listOf("name")).unsafeRunSync()
 
@@ -90,8 +92,8 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
 
         "find all albums sorted by name with asc direction and album raw projection" {
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             val result = albumRepositoryJpa.findAll(AlbumRaw::class, sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
 
             result.content shouldBe listOf(album1, album2).map { AlbumEntityJpa.toModelRaw(it) }
@@ -133,8 +135,8 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
 
         "find by group id sorted by album name with default direction" {
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum()
             val result = albumRepositoryJpa.findByGroupId(group.id, AlbumBase::class, sort = listOf("name")).unsafeRunSync()
 
@@ -143,8 +145,8 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
 
         "find by group id sorted by album name with asc direction" {
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum()
 
             val result = albumRepositoryJpa.findByGroupId(group.id, AlbumWithGroup::class,
@@ -154,7 +156,7 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
         }
 
         "find by group name" {
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(generator.generateGroupCreation("my name")))
+            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
             val album1 = factory.insertAlbum(group = group)
             factory.insertAlbum()
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumRaw::class).unsafeRunSync()
@@ -163,10 +165,10 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
         }
 
         "find by group name sorted by album name with default direction" {
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(generator.generateGroupCreation("my name")))
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
-            factory.insertAlbum(generator.generateAlbumCreation())
+            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
+            factory.insertAlbum(Arb.albumCreation().single())
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumBase::class,
                     sort = listOf("name")).unsafeRunSync()
 
@@ -174,10 +176,10 @@ class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, g
         }
 
         "find by group name sorted by album name with asc direction" {
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(generator.generateGroupCreation("my name")))
-            val album1 = factory.insertAlbum(generator.generateAlbumCreation(name = "a"), group)
-            val album2 = factory.insertAlbum(generator.generateAlbumCreation(name = "b"), group)
-            factory.insertAlbum(generator.generateAlbumCreation())
+            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
+            val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
+            val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
+            factory.insertAlbum(Arb.albumCreation().single())
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumRaw::class,
                     sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
 

@@ -6,6 +6,8 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.single
 import io.kotest.spring.SpringListener
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -16,7 +18,7 @@ import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
 import rackdon.kosic.utils.FactoryJpa
-import rackdon.kosic.utils.Generator
+import rackdon.kosic.utils.generator.groupCreation
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.EntityManager
@@ -29,7 +31,6 @@ class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) :
 
     private val groupRepositoryJpa = GroupRepositoryJpa(groupJpa)
     private val databaseCleaner = DatabaseCleanerPsql(entityManager)
-    private val generator = Generator()
     private val factory = FactoryJpa(entityManager)
 
     override fun beforeTest(testCase: TestCase) {
@@ -59,16 +60,16 @@ class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) :
         }
 
         "find all groups sorted by name with default direction" {
-            val group1 = factory.insertGroup(generator.generateGroupCreation(name = "a"))
-            val group2 = factory.insertGroup(generator.generateGroupCreation(name = "b"))
+            val group1 = factory.insertGroup(Arb.groupCreation(name = "a").single())
+            val group2 = factory.insertGroup(Arb.groupCreation(name = "b").single())
             val result = groupRepositoryJpa.findAll(GroupRaw::class, sort = listOf("name")).unsafeRunSync()
 
             result.content shouldBe listOf(group2, group1).map { GroupEntityJpa.toModelRaw(it) }
         }
 
         "find all groups sorted by name with asc direction" {
-            val group1 = factory.insertGroup(generator.generateGroupCreation(name = "a"))
-            val group2 = factory.insertGroup(generator.generateGroupCreation(name = "b"))
+            val group1 = factory.insertGroup(Arb.groupCreation(name = "a").single())
+            val group2 = factory.insertGroup(Arb.groupCreation(name = "b").single())
             val result = groupRepositoryJpa.findAll(GroupRaw::class, sort = listOf("name"), sortDir = SortDir.ASC)
                 .unsafeRunSync()
 

@@ -38,9 +38,10 @@ repositories {
 sourceSets {
 	integrationTest {
 		kotlin {
-			compileClasspath += main.output
-			runtimeClasspath += main.output
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
 		}
+		kotlin.srcDir('src/integrationTest')
 		resources.srcDir file('src/integrationTest/resources')
 	}
 }

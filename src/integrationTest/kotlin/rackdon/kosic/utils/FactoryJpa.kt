@@ -1,4 +1,6 @@
 package rackdon.kosic.utils
+import io.kotest.property.Arb
+import io.kotest.property.arbitrary.single
 import rackdon.kosic.model.AlbumCreation
 import rackdon.kosic.model.AlbumRaw
 import rackdon.kosic.model.GroupCreation
@@ -7,11 +9,13 @@ import rackdon.kosic.model.SongCreation
 import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.repository.entity.jpa.SongEntityJpa
+import rackdon.kosic.utils.generator.albumCreation
+import rackdon.kosic.utils.generator.groupCreation
+import rackdon.kosic.utils.generator.songCreation
 import javax.persistence.EntityManager
 import kotlin.reflect.full.memberProperties
 
 class FactoryJpa(private val entityManager: EntityManager) : Factory {
-    private val generator = Generator()
 
     private inline fun <reified T : Any> T.asMap(): Map<String, Any?> {
         val props = T::class.memberProperties.associateBy { it.name }
@@ -38,7 +42,7 @@ class FactoryJpa(private val entityManager: EntityManager) : Factory {
     }
 
     override fun insertGroup(groupCreation: GroupCreation?): GroupEntityJpa {
-        val groupEntityJpa = GroupEntityJpa.fromCreation(groupCreation ?: generator.generateGroupCreation())
+        val groupEntityJpa = GroupEntityJpa.fromCreation(groupCreation ?: Arb.groupCreation().single())
         return insert(groupEntityJpa)
     }
 
@@ -48,7 +52,7 @@ class FactoryJpa(private val entityManager: EntityManager) : Factory {
             else -> find(GroupEntityJpa::class.java, group.id)
                 ?: insertGroup(GroupCreation(group.name, group.members, group.createdOn, group.dissolvedOn))
         }
-        val finalAlbumCreation = albumCreation ?: generator.generateAlbumCreation()
+        val finalAlbumCreation = albumCreation ?: Arb.albumCreation().single()
         val albumEntityJpa = AlbumEntityJpa(
                 name = finalAlbumCreation.name,
                 group = groupEntityJpa,
@@ -61,7 +65,7 @@ class FactoryJpa(private val entityManager: EntityManager) : Factory {
             null -> insertAlbum()
             else -> find(AlbumEntityJpa::class.java, album.id) ?: insertAlbum(AlbumCreation(album.name, album.groupId, album.createdOn))
         }
-        val finalSongCreation = songCreation ?: generator.generateSongCreation()
+        val finalSongCreation = songCreation ?: Arb.songCreation().single()
         val songEntityJpa = SongEntityJpa(
                 name = finalSongCreation.name,
                 album = albumJpa,
