@@ -25,12 +25,12 @@ import rackdon.kosic.utils.generator.albumRaw
 import java.util.UUID
 import rackdon.kosic.model.Page as ServicePage
 
-class AlbumServiceIOJpaTest: StringSpec() {
+class AlbumServiceIOJpaTest : StringSpec() {
     override fun isolationMode() = IsolationMode.InstancePerTest
 
     private val albumRepositoryMock = mockk<AlbumRepositoryIOJpa>()
     private val albumService = AlbumServiceIOJpa(albumRepositoryMock)
-    
+
     init {
         "Create album returns IO of albumRaw" {
             val albumCreation = Arb.albumCreation().single()

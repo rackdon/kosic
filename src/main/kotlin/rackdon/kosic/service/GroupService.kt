@@ -11,7 +11,7 @@ import rackdon.kosic.model.SortDir
 import java.util.UUID
 import kotlin.reflect.KClass
 
-interface GroupService<T> {
+interface GroupService<T, Y> : PaginationService<T, Y> {
     fun createGroup(groupCreation: GroupCreation): Kind<T, Group>
     fun getGroups(projection: KClass<out Group>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): Kind<T, DataWithPages<Group>>

@@ -1,10 +1,10 @@
 package rackdon.kosic.service
 
 import arrow.core.Option
-import arrow.core.getOrElse
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import arrow.syntax.function.partially1
 import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Group
@@ -16,13 +16,14 @@ import rackdon.kosic.repository.GroupRepositoryIOJpa
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.streams.toList
+import org.springframework.data.domain.Page as JpaPage
 
 @Service
-class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupService<ForIO> {
-    private val defaultPage = Page()
-    private val defaultPageSize = PageSize()
-    private val defaultSort = emptyList<String>()
-    private val defaultSortDir = SortDir.DESC
+class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupService<ForIO, JpaPage<out Group>> {
+    override val defaultPage = Page()
+    override val defaultPageSize = PageSize()
+    override val defaultSort = emptyList<String>()
+    override val defaultSortDir = SortDir.DESC
 
     override fun createGroup(groupCreation: GroupCreation): IO<Group> {
         return groupRepository.save(groupCreation)
@@ -30,12 +31,8 @@ class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupServic
 
     override fun getGroups(projection: KClass<out Group>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Group>> {
-        val finalPage = page.getOrElse { defaultPage }
-        val finalPageSize = pageSize.getOrElse { defaultPageSize }
-        val finalSort = sort.getOrElse { defaultSort }
-        val finalSortDir = sortDir.getOrElse { defaultSortDir }
         return IO.fx {
-            val groups = !groupRepository.findAll(projection, finalPage, finalPageSize, finalSort, finalSortDir)
+            val groups = !super.ensurePagination(groupRepository::findAll.partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(groups.get().toList(), groups.totalPages.toUInt())
         }
     }
