@@ -42,7 +42,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
             verify(exactly = 1) { albumRepositoryMock.save(albumCreation) }
         }
 
-        "Get Albums is called projection and None values and return albums with pages" {
+        "Get Albums is called with projection and None values and return albums with pages" {
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
             val ioAlbumRaw = IO { albumPage }
