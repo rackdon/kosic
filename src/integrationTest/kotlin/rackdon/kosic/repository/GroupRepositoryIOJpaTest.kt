@@ -26,7 +26,7 @@ import javax.persistence.EntityManager
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(false)
 @DataJpaTest
-class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) : StringSpec() {
+class GroupRepositoryIOJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) : StringSpec() {
     override fun listeners() = listOf(SpringListener)
 
     private val groupRepositoryJpa = GroupRepositoryIOJpa(groupJpa)

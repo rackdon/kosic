@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Group
 import rackdon.kosic.model.GroupCreation
+import rackdon.kosic.model.GroupRaw
 import rackdon.kosic.model.Page
 import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.SortDir
@@ -25,7 +26,7 @@ class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupServic
     override val defaultSort = emptyList<String>()
     override val defaultSortDir = SortDir.DESC
 
-    override fun createGroup(groupCreation: GroupCreation): IO<Group> {
+    override fun createGroup(groupCreation: GroupCreation): IO<GroupRaw> {
         return groupRepository.save(groupCreation)
     }
 

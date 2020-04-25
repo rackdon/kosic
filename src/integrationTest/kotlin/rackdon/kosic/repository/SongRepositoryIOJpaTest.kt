@@ -34,7 +34,7 @@ import javax.persistence.EntityManager
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(false)
 @DataJpaTest
-class SongRepositoryJpaTest(entityManager: EntityManager, songJpa: SongJpa, albumJpa: AlbumJpa) : StringSpec() {
+class SongRepositoryIOJpaTest(entityManager: EntityManager, songJpa: SongJpa, albumJpa: AlbumJpa) : StringSpec() {
     override fun listeners() = listOf(SpringListener)
 
     private val songRepositoryJpa = SongRepositoryIOJpa(songJpa, albumJpa)
