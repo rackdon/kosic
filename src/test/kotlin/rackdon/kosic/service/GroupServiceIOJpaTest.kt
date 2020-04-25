@@ -25,7 +25,7 @@ import rackdon.kosic.utils.generator.groupRaw
 import java.util.UUID
 import rackdon.kosic.model.Page as ServicePage
 
-class GroupServiceTest : StringSpec() {
+class GroupServiceIOJpaTest : StringSpec() {
     override fun isolationMode() = IsolationMode.InstancePerTest
 
     private val groupRepositoryMock = mockk<GroupRepositoryIOJpa>()
@@ -76,7 +76,7 @@ class GroupServiceTest : StringSpec() {
             verify(exactly = 1) { groupRepositoryMock.findAll(projection, page, pageSize, sort, sortDir) }
         }
 
-        "Get plan group by id return IO option of the specified plan group projection" {
+        "Get group by id return IO option of the specified group projection" {
             val groupId = UUID.randomUUID()
             val response = IO { Option.just(Arb.groupRaw().single()) }
             val projection = GroupRaw::class
@@ -87,7 +87,7 @@ class GroupServiceTest : StringSpec() {
             verify(exactly = 1) { groupRepositoryMock.findById(groupId, projection) }
         }
 
-        "Get plan group by name return IO option of the specified plan group projection" {
+        "Get group by name return IO option of the specified group projection" {
             val groupName = "name"
             val response = IO { Option.just(Arb.groupRaw().single()) }
             val projection = GroupRaw::class
