@@ -25,7 +25,7 @@ interface GroupJpa : JpaRepository<GroupEntityJpa, UUID> {
 }
 
 @Repository
-class GroupRepositoryJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO> {
+class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO> {
     private fun getPageRequest(page: GroupPage, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
         val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
         return PageRequest.of(page.value.toInt(), pageSize.value.toInt(), finalSort)

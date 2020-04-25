@@ -35,7 +35,7 @@ import javax.persistence.EntityManager
 class AlbumRepositoryJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa, groupJpa: GroupJpa) : StringSpec() {
     override fun listeners() = listOf(SpringListener)
 
-    private val albumRepositoryJpa = AlbumRepositoryJpa(albumJpa, groupJpa)
+    private val albumRepositoryJpa = AlbumRepositoryIOJpa(albumJpa, groupJpa)
     private val databaseCleaner = DatabaseCleanerPsql(entityManager)
     private val factory = FactoryJpa(entityManager)
 

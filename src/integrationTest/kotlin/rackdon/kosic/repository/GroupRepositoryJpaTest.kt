@@ -29,7 +29,7 @@ import javax.persistence.EntityManager
 class GroupRepositoryJpaTest(entityManager: EntityManager, groupJpa: GroupJpa) : StringSpec() {
     override fun listeners() = listOf(SpringListener)
 
-    private val groupRepositoryJpa = GroupRepositoryJpa(groupJpa)
+    private val groupRepositoryJpa = GroupRepositoryIOJpa(groupJpa)
     private val databaseCleaner = DatabaseCleanerPsql(entityManager)
     private val factory = FactoryJpa(entityManager)
 

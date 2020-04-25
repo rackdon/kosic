@@ -35,7 +35,7 @@ interface SongJpa : JpaRepository<SongEntityJpa, UUID> {
 }
 
 @Repository
-class SongRepositoryJpa(private val songJpa: SongJpa, private val albumJpa: AlbumJpa) : SongRepository<ForIO> {
+class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: AlbumJpa) : SongRepository<ForIO> {
 
     private fun getPageRequest(page: rackdon.kosic.model.Page, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
         val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())

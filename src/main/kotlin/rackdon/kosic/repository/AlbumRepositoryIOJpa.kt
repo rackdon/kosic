@@ -30,7 +30,7 @@ interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
 }
 
 @Repository
-class AlbumRepositoryJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) : AlbumRepository<ForIO> {
+class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) : AlbumRepository<ForIO> {
 
     private fun getPageRequest(page: AlbumPage, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
         val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
