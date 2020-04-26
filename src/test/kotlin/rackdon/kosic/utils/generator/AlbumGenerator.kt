@@ -6,6 +6,7 @@ import io.kotest.property.arbitrary.localDateTime
 import io.kotest.property.arbitrary.single
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.uuid
+import rackdon.kosic.controller.dto.AlbumCreationDto
 import rackdon.kosic.model.AlbumCreation
 import rackdon.kosic.model.AlbumRaw
 import java.time.LocalDateTime
@@ -18,6 +19,18 @@ fun Arb.Companion.albumCreation(
 ) =
     arb { generateSequence {
         AlbumCreation(
+                name = name ?: Arb.string(1, GeneratorConstants.STRING_LIMIT).single(),
+                groupId = groupId ?: Arb.uuid().single(),
+                createdOn = createdOn ?: Arb.localDateTime().single())
+    } }
+
+fun Arb.Companion.albumCreationDto(
+        name: String? = null,
+        groupId: UUID? = null,
+        createdOn: LocalDateTime? = null
+) =
+    arb { generateSequence {
+        AlbumCreationDto(
                 name = name ?: Arb.string(1, GeneratorConstants.STRING_LIMIT).single(),
                 groupId = groupId ?: Arb.uuid().single(),
                 createdOn = createdOn ?: Arb.localDateTime().single())

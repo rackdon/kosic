@@ -1,6 +1,5 @@
 package rackdon.kosic.service
 
-import arrow.Kind
 import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -8,6 +7,7 @@ import arrow.fx.extensions.fx
 import arrow.syntax.function.partially1
 import rackdon.kosic.model.Album
 import rackdon.kosic.model.AlbumCreation
+import rackdon.kosic.model.AlbumRaw
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Page
 import rackdon.kosic.model.PageSize
@@ -24,7 +24,7 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override val defaultSort = emptyList<String>()
     override val defaultSortDir = SortDir.DESC
 
-    override fun createAlbum(albumCreation: AlbumCreation): Kind<ForIO, Album> {
+    override fun createAlbum(albumCreation: AlbumCreation): IO<AlbumRaw> {
         return albumRepository.save(albumCreation)
     }
 
