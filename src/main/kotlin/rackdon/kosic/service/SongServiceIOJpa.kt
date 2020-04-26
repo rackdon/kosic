@@ -1,6 +1,5 @@
 package rackdon.kosic.service
 
-import arrow.Kind
 import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -11,6 +10,7 @@ import rackdon.kosic.model.Page
 import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.Song
 import rackdon.kosic.model.SongCreation
+import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.SongRepositoryIOJpa
 import java.util.UUID
@@ -24,7 +24,7 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
     override val defaultSort = emptyList<String>()
     override val defaultSortDir = SortDir.DESC
 
-    override fun createSong(songCreation: SongCreation): Kind<ForIO, Song> {
+    override fun createSong(songCreation: SongCreation): IO<SongRaw> {
         return songRepository.save(songCreation)
     }
 

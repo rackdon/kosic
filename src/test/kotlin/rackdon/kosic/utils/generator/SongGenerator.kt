@@ -8,6 +8,7 @@ import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.single
 import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.uuid
+import rackdon.kosic.controller.dto.SongCreationDto
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.utils.generator.GeneratorConstants.MAP_LIMIT
@@ -27,6 +28,22 @@ fun Arb.Companion.songCreation(
                 name = name ?: Arb.string(1, GeneratorConstants.STRING_LIMIT).single(),
                 albumId = albumId ?: Arb.uuid().single(),
                 duration = duration ?: Arb.positiveInts().single().toUInt(),
+                createdOn = createdOn ?: Arb.localDateTime().single(),
+                meta = meta ?: Arb.map(Arb.string(1, STRING_LIMIT), Arb.string(1, STRING_LIMIT), 0, MAP_LIMIT).single())
+    } }
+
+fun Arb.Companion.songCreationDto(
+        name: String? = null,
+        albumId: UUID? = null,
+        duration: Int? = null,
+        createdOn: LocalDateTime? = null,
+        meta: Map<String, Any>? = null
+) =
+    arb { generateSequence {
+        SongCreationDto(
+                name = name ?: Arb.string(1, STRING_LIMIT).single(),
+                albumId = albumId ?: Arb.uuid().single(),
+                duration = duration ?: Arb.positiveInts().single(),
                 createdOn = createdOn ?: Arb.localDateTime().single(),
                 meta = meta ?: Arb.map(Arb.string(1, STRING_LIMIT), Arb.string(1, STRING_LIMIT), 0, MAP_LIMIT).single())
     } }
