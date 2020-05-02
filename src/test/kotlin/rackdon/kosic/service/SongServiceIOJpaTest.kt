@@ -20,6 +20,7 @@ import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.SongRepositoryIOJpa
+import rackdon.kosic.repository.k
 import rackdon.kosic.utils.generator.songCreation
 import rackdon.kosic.utils.generator.songRaw
 import java.util.UUID
@@ -45,7 +46,7 @@ class SongServiceIOJpaTest : StringSpec() {
         "Get Songs is called with projection and None values and return songs with pages" {
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
 
             every { songRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioSongRaw
@@ -61,7 +62,7 @@ class SongServiceIOJpaTest : StringSpec() {
         "Get Songs is called with all values and return songs with pages" {
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -102,7 +103,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val albumId = UUID.randomUUID()
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
 
             every { songRepositoryMock.findByAlbumId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
@@ -119,7 +120,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val albumId = UUID.randomUUID()
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -138,7 +139,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val albumName = "album name"
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
 
             every { songRepositoryMock.findByAlbumName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
@@ -155,7 +156,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val albumName = "album name"
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -174,7 +175,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val groupId = UUID.randomUUID()
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
 
             every { songRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
@@ -191,7 +192,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val groupId = UUID.randomUUID()
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -210,7 +211,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val groupName = "group name"
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
 
             every { songRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
@@ -227,7 +228,7 @@ class SongServiceIOJpaTest : StringSpec() {
             val groupName = "group name"
             val songList = Arb.songRaw().take(1).toList()
             val songPage: Page<SongRaw> = PageImpl(songList)
-            val ioSongRaw = IO { songPage }
+            val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)

@@ -33,7 +33,8 @@ class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupServic
     override fun getGroups(projection: KClass<out Group>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Group>> {
         return IO.fx {
-            val groups = !super.ensurePagination(groupRepository::findAll.partially1(projection), page, pageSize, sort, sortDir)
+            val groups = !super.ensurePagination(groupRepository::findAll.partially1(projection), page,
+                    pageSize, sort, sortDir)
             DataWithPages(groups.get().toList(), groups.totalPages.toUInt())
         }
     }

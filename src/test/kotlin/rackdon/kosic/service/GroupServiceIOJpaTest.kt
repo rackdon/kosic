@@ -20,6 +20,7 @@ import rackdon.kosic.model.GroupRaw
 import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.GroupRepositoryIOJpa
+import rackdon.kosic.repository.k
 import rackdon.kosic.utils.generator.groupCreation
 import rackdon.kosic.utils.generator.groupRaw
 import java.util.UUID
@@ -45,7 +46,7 @@ class GroupServiceIOJpaTest : StringSpec() {
         "Get Groups is called projection and None values and return groups with pages" {
             val groupList = Arb.groupRaw().take(1).toList()
             val groupPage: Page<GroupRaw> = PageImpl(groupList)
-            val ioGroupRaw = IO { groupPage }
+            val ioGroupRaw = IO { groupPage.k() }
             val projection = GroupRaw::class
 
             every { groupRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioGroupRaw
@@ -61,7 +62,7 @@ class GroupServiceIOJpaTest : StringSpec() {
         "Get Groups is called with all values and return groups with pages" {
             val groupList = Arb.groupRaw().take(1).toList()
             val groupPage: Page<GroupRaw> = PageImpl(groupList)
-            val ioGroupRaw = IO { groupPage }
+            val ioGroupRaw = IO { groupPage.k() }
             val projection = GroupRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)

@@ -30,7 +30,8 @@ interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
 }
 
 @Repository
-class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) : AlbumRepository<ForIO> {
+class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) :
+    AlbumRepository<ForIO, ForIO, ForPageK> {
 
     private fun getPageRequest(page: AlbumPage, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
         val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
@@ -57,10 +58,10 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
     }
 
     override fun findAll(projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize, sort: List<String>,
-            sortDir: SortDir): IO<Page<out Album>> {
+            sortDir: SortDir): IO<PageK<out Album>> {
         val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
         val transformer = getTransformer(projection)
-        return IO { albumJpa.findAll(pageRequest).map { transformer(it) } }
+        return IO { albumJpa.findAll(pageRequest).map { transformer(it) }.k() }
     }
 
     override fun findById(id: UUID, projection: KClass<out Album>): IO<Option<Album>> {
@@ -74,15 +75,15 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
     }
 
     override fun findByGroupId(groupId: UUID, projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize,
-            sort: List<String>, sortDir: SortDir): IO<Page<out Album>> {
+            sort: List<String>, sortDir: SortDir): IO<PageK<out Album>> {
         val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
         val transformer = getTransformer(projection)
-        return IO { albumJpa.findByGroupId(groupId, pageRequest).map { transformer(it) } }
+        return IO { albumJpa.findByGroupId(groupId, pageRequest).map { transformer(it) }.k() }
     }
     override fun findByGroupName(groupName: String, projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize,
-            sort: List<String>, sortDir: SortDir): IO<Page<out Album>> {
+            sort: List<String>, sortDir: SortDir): IO<PageK<out Album>> {
         val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
         val finalProjection = getTransformer(projection)
-        return IO { albumJpa.findByGroupName(groupName, pageRequest).map { finalProjection(it) } }
+        return IO { albumJpa.findByGroupName(groupName, pageRequest).map { finalProjection(it) }.k() }
     }
 }

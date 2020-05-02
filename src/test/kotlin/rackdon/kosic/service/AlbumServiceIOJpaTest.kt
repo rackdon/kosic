@@ -15,11 +15,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
-import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.AlbumRaw
+import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.AlbumRepositoryIOJpa
+import rackdon.kosic.repository.k
 import rackdon.kosic.utils.generator.albumCreation
 import rackdon.kosic.utils.generator.albumRaw
 import java.util.UUID
@@ -45,7 +46,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
         "Get Albums is called with projection and None values and return albums with pages" {
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
 
             every { albumRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioAlbumRaw
@@ -61,7 +62,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
         "Get Albums is called with all values and return albums with pages" {
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -102,7 +103,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val groupId = UUID.randomUUID()
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
 
             every { albumRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
@@ -119,7 +120,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val groupId = UUID.randomUUID()
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)
@@ -138,7 +139,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val groupName = "group name"
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
 
             every { albumRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
@@ -155,7 +156,7 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val groupName = "group name"
             val albumList = Arb.albumRaw().take(1).toList()
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
-            val ioAlbumRaw = IO { albumPage }
+            val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
             val page = ServicePage(2u)
             val pageSize = PageSize(20u)

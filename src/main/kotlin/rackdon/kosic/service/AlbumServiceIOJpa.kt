@@ -33,7 +33,8 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbums(projection: KClass<out Album>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !super.ensurePagination(albumRepository::findAll.partially1(projection), page, pageSize, sort, sortDir)
+            val albums = !super.ensurePagination(albumRepository::findAll.partially1(projection), page,
+                    pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
     }
