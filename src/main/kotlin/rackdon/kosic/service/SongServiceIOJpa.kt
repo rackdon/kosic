@@ -5,6 +5,7 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import arrow.syntax.function.partially1
+import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Page
 import rackdon.kosic.model.PageSize
@@ -18,6 +19,7 @@ import kotlin.reflect.KClass
 import kotlin.streams.toList
 import org.springframework.data.domain.Page as JpaPage
 
+@Service
 class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongService<ForIO, JpaPage<out Song>> {
     override val defaultPage = Page()
     override val defaultPageSize = PageSize()

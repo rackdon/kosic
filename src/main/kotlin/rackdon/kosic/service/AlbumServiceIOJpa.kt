@@ -5,6 +5,7 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import arrow.syntax.function.partially1
+import org.springframework.stereotype.Service
 import rackdon.kosic.model.Album
 import rackdon.kosic.model.AlbumCreation
 import rackdon.kosic.model.AlbumRaw
@@ -18,6 +19,7 @@ import kotlin.reflect.KClass
 import kotlin.streams.toList
 import org.springframework.data.domain.Page as JpaPage
 
+@Service
 class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : AlbumService<ForIO, JpaPage<out Album>> {
     override val defaultPage = Page()
     override val defaultPageSize = PageSize()
