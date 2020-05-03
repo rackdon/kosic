@@ -3,8 +3,6 @@ package rackdon.kosic.repository
 import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Group
@@ -24,11 +22,7 @@ interface GroupJpa : JpaRepository<GroupEntityJpa, UUID> {
 }
 
 @Repository
-class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO, ForIO, ForPageK> {
-    private fun getPageRequest(page: GroupPage, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
-        val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
-        return PageRequest.of(page.value.toInt(), pageSize.value.toInt(), finalSort)
-    }
+class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityJpa: GroupEntityJpa) -> Group {
         return { groupJpa -> when (projection) {

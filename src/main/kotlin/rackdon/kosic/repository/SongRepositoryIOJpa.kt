@@ -4,9 +4,7 @@ import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -36,13 +34,7 @@ interface SongJpa : JpaRepository<SongEntityJpa, UUID> {
 
 @Repository
 class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: AlbumJpa) :
-    SongRepository<ForIO, ForIO, ForPageK> {
-
-    private fun getPageRequest(page: rackdon.kosic.model.Page, pageSize: PageSize, sort: List<String>, sortDir: SortDir):
-            PageRequest {
-        val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
-        return PageRequest.of(page.value.toInt(), pageSize.value.toInt(), finalSort)
-    }
+    SongRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
 
     private fun getTransformer(projection: KClass<out Song>): (songEntityJpa: SongEntityJpa) -> Song {
         return { songJpa -> when (projection) {

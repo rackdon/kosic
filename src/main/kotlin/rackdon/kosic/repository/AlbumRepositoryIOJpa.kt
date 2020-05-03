@@ -4,9 +4,7 @@ import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Album
@@ -31,12 +29,7 @@ interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
 
 @Repository
 class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) :
-    AlbumRepository<ForIO, ForIO, ForPageK> {
-
-    private fun getPageRequest(page: AlbumPage, pageSize: PageSize, sort: List<String>, sortDir: SortDir): PageRequest {
-        val finalSort = if (sort.isEmpty()) Sort.unsorted() else Sort.by(Sort.Direction.valueOf(sortDir.name), *sort.toTypedArray())
-        return PageRequest.of(page.value.toInt(), pageSize.value.toInt(), finalSort)
-    }
+    AlbumRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
 
     private fun getTransformer(projection: KClass<out Album>): (albumEntityJpa: AlbumEntityJpa) -> Album {
         return { albumJpa -> when (projection) {
