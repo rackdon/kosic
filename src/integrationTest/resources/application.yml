@@ -11,6 +11,14 @@ spring:
     jpa:
       show-sql: true
       generate-ddl: false
+  data:
+    mongodb:
+      authentication-database: admin
+      database: kosic_test
+      host: localhost
+      port: 27017
+      username: rackdon
+      password: rackdon
 
 server:
   port: 8080
