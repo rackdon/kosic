@@ -1,18 +1,29 @@
 version: '3.7'
 
 services:
-  db:
+  psql-db:
     image: postgres:11-alpine
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
-    container_name: kosicdb
+    container_name: kosic-psql-db
     ports:
       - 5432:5432
     volumes:
       - ./provision/sql:/docker-entrypoint-initdb.d/
-      - kosic-data:/var/lib/postgresql/data
+      - kosic-psql-data:/var/lib/postgresql/data
+  mongodb:
+    image: mongo:4.2.2
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - ./provision/mongo:/docker-entrypoint-initdb.d/
+      - kosic-mongodb-data:/data/db
 
 volumes:
-  kosic-data:
+  kosic-psql-data:
+  kosic-mongodb-data:
 
 
