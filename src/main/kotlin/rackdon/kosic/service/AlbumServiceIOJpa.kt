@@ -33,7 +33,7 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbums(projection: KClass<out Album>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !super.ensurePagination(albumRepository::findAll.partially1(projection), page,
+            val albums = !ensurePagination(albumRepository::findAll.partially1(projection), page,
                     pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
@@ -50,7 +50,7 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbumsByGroupId(groupId: UUID, projection: KClass<out Album>, page: Option<Page>,
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !super.ensurePagination(albumRepository::findByGroupId.partially1(groupId)
+            val albums = !ensurePagination(albumRepository::findByGroupId.partially1(groupId)
                 .partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
@@ -59,7 +59,7 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbumsByGroupName(groupName: String, projection: KClass<out Album>, page: Option<Page>,
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !super.ensurePagination(albumRepository::findByGroupName.partially1(groupName)
+            val albums = !ensurePagination(albumRepository::findByGroupName.partially1(groupName)
                 .partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }

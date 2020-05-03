@@ -34,7 +34,7 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !super.ensurePagination(songRepository::findAll.partially1(projection), page, pageSize, sort, sortDir)
+            val songs = !ensurePagination(songRepository::findAll.partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }
@@ -51,7 +51,7 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !super.ensurePagination(songRepository::findByAlbumId.partially1(albumId)
+            val songs = !ensurePagination(songRepository::findByAlbumId.partially1(albumId)
                 .partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
@@ -61,7 +61,7 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !super.ensurePagination(songRepository::findByAlbumName.partially1(albumName)
+            val songs = !ensurePagination(songRepository::findByAlbumName.partially1(albumName)
                 .partially1(projection), page, pageSize, sort, sortDir)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
