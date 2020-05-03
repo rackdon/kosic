@@ -1,10 +1,8 @@
 package rackdon.kosic.utils
 
 interface DatabaseCleaner {
-    val versionControlTableNames: List<String>
-
     /**
-     * Get table names from the database. Excluding the version control tables
+     * Get table names from the database.
      * @return a list of table names
      */
     fun getTableNames(): List<String>
