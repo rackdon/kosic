@@ -17,10 +17,9 @@ import rackdon.kosic.repository.AlbumRepositoryIOJpa
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.streams.toList
-import org.springframework.data.domain.Page as JpaPage
 
 @Service
-class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : AlbumService<ForIO, JpaPage<out Album>> {
+class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : AlbumService<ForIO> {
     override val defaultPage = Page()
     override val defaultPageSize = PageSize()
     override val defaultSort = emptyList<String>()
@@ -33,8 +32,8 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbums(projection: KClass<out Album>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !ensurePagination(albumRepository::findAll.partially1(projection), page,
-                    pageSize, sort, sortDir)
+            val albums = !albumRepository::findAll.partially1(projection)
+                .ensurePagination(page, pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
     }
@@ -50,8 +49,8 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbumsByGroupId(groupId: UUID, projection: KClass<out Album>, page: Option<Page>,
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !ensurePagination(albumRepository::findByGroupId.partially1(groupId)
-                .partially1(projection), page, pageSize, sort, sortDir)
+            val albums = !albumRepository::findByGroupId.partially1(groupId).partially1(projection)
+                .ensurePagination(page, pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
     }
@@ -59,8 +58,8 @@ class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : Alb
     override fun getAlbumsByGroupName(groupName: String, projection: KClass<out Album>, page: Option<Page>,
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Album>> {
         return IO.fx {
-            val albums = !ensurePagination(albumRepository::findByGroupName.partially1(groupName)
-                .partially1(projection), page, pageSize, sort, sortDir)
+            val albums = !albumRepository::findByGroupName.partially1(groupName).partially1(projection)
+                .ensurePagination(page, pageSize, sort, sortDir)
             DataWithPages(albums.get().toList(), albums.totalPages.toUInt())
         }
     }

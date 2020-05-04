@@ -17,10 +17,9 @@ import rackdon.kosic.repository.GroupRepositoryIOJpa
 import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.streams.toList
-import org.springframework.data.domain.Page as JpaPage
 
 @Service
-class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupService<ForIO, JpaPage<out Group>> {
+class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupService<ForIO> {
     override val defaultPage = Page()
     override val defaultPageSize = PageSize()
     override val defaultSort = emptyList<String>()
@@ -33,8 +32,8 @@ class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupServic
     override fun getGroups(projection: KClass<out Group>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): IO<DataWithPages<Group>> {
         return IO.fx {
-            val groups = !ensurePagination(groupRepository::findAll.partially1(projection), page,
-                    pageSize, sort, sortDir)
+            val groups = !groupRepository::findAll.partially1(projection)
+                .ensurePagination(page, pageSize, sort, sortDir)
             DataWithPages(groups.get().toList(), groups.totalPages.toUInt())
         }
     }
