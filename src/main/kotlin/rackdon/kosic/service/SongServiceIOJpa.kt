@@ -4,11 +4,11 @@ import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
-import arrow.syntax.function.partially1
 import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Page
 import rackdon.kosic.model.PageSize
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.Song
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
@@ -20,10 +20,6 @@ import kotlin.streams.toList
 
 @Service
 class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongService<ForIO> {
-    override val defaultPage = Page()
-    override val defaultPageSize = PageSize()
-    override val defaultSort = emptyList<String>()
-    override val defaultSortDir = SortDir.DESC
 
     override fun createSong(songCreation: SongCreation): IO<SongRaw> {
         return songRepository.save(songCreation)
@@ -33,8 +29,8 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !songRepository::findAll.partially1(projection)
-                .ensurePagination(page, pageSize, sort, sortDir)
+            val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
+            val songs = !songRepository.findAll(projection, pagination)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }
@@ -51,8 +47,8 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !songRepository::findByAlbumId.partially1(albumId).partially1(projection)
-                .ensurePagination(page, pageSize, sort, sortDir)
+            val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
+            val songs = !songRepository.findByAlbumId(albumId, projection, pagination)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }
@@ -61,8 +57,8 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !songRepository::findByAlbumName.partially1(albumName).partially1(projection)
-                .ensurePagination(page, pageSize, sort, sortDir)
+            val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
+            val songs = !songRepository.findByAlbumName(albumName, projection, pagination)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }
@@ -71,8 +67,8 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !songRepository::findByGroupId.partially1(groupId).partially1(projection)
-                .ensurePagination(page, pageSize, sort, sortDir)
+            val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
+            val songs = !songRepository.findByGroupId(groupId, projection, pagination)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }
@@ -81,8 +77,8 @@ class SongServiceIOJpa(private val songRepository: SongRepositoryIOJpa) : SongSe
             pageSize: Option<PageSize>, sort: Option<List<String>>, sortDir: Option<SortDir>
     ): IO<DataWithPages<Song>> {
         return IO.fx {
-            val songs = !songRepository::findByGroupName.partially1(groupName).partially1(projection)
-                .ensurePagination(page, pageSize, sort, sortDir)
+            val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
+            val songs = !songRepository.findByGroupName(groupName, projection, pagination)
             DataWithPages(songs.get().toList(), songs.totalPages.toUInt())
         }
     }

@@ -13,16 +13,17 @@ import io.kotest.spring.SpringListener
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.annotation.Rollback
+import rackdon.kosic.model.AlbumNotFound
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SongBase
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SongWithAlbum
-import rackdon.kosic.model.AlbumNotFound
 import rackdon.kosic.model.SongWithAlbumAndGroup
 import rackdon.kosic.model.SortDir
-import rackdon.kosic.repository.entity.jpa.SongEntityJpa
 import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
+import rackdon.kosic.repository.entity.jpa.SongEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
 import rackdon.kosic.utils.FactoryJpa
 import rackdon.kosic.utils.generator.albumCreation
@@ -70,35 +71,39 @@ class SongRepositoryIOJpaTest(entityManager: EntityManager, songJpa: SongJpa, al
         }
 
         "find all songs returning raw songs projection" {
+            val pagination = Pagination()
             val song = factory.insertSong()
 
-            val result = songRepositoryJpa.findAll(SongRaw::class).unsafeRunSync()
+            val result = songRepositoryJpa.findAll(SongRaw::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelRaw(song))
         }
 
         "find all songs returning songs with albums projection" {
+            val pagination = Pagination()
             val song = factory.insertSong()
-            val result = songRepositoryJpa.findAll(SongWithAlbum::class).unsafeRunSync()
+            val result = songRepositoryJpa.findAll(SongWithAlbum::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelWithAlbum(song))
         }
 
         "find all songs sorted by name with default direction and song base projection" {
+            val pagination = Pagination(sort = listOf("name"))
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
 
-            val result = songRepositoryJpa.findAll(SongBase::class, sort = listOf("name")).unsafeRunSync()
+            val result = songRepositoryJpa.findAll(SongBase::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelBase(it) }
         }
 
         "find all songs sorted by name with asc direction and song raw projection" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
-            val result = songRepositoryJpa.findAll(SongRaw::class, sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+            val result = songRepositoryJpa.findAll(SongRaw::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelRaw(it) }
         }
@@ -130,123 +135,140 @@ class SongRepositoryIOJpaTest(entityManager: EntityManager, songJpa: SongJpa, al
         }
 
         "find by album id" {
+            val pagination = Pagination()
             val song1 = factory.insertSong()
             factory.insertSong()
-            val result = songRepositoryJpa.findByAlbumId(song1.album.id, SongWithAlbum::class).unsafeRunSync()
+            val result = songRepositoryJpa.findByAlbumId(song1.album.id, SongWithAlbum::class,
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelWithAlbum(song1))
         }
 
         "find by album id sorted by song name with default direction" {
+            val pagination = Pagination(sort = listOf("name"))
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong()
-            val result = songRepositoryJpa.findByAlbumId(album.id, SongBase::class, sort = listOf("name")).unsafeRunSync()
+            val result = songRepositoryJpa.findByAlbumId(album.id, SongBase::class,
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelBase(it) }
         }
 
         "find by album id sorted by song name with asc direction" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong()
 
             val result = songRepositoryJpa.findByAlbumId(album.id, SongWithAlbum::class,
-                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelWithAlbum(it) }
         }
 
         "find by album name" {
+            val pagination = Pagination()
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(Arb.albumCreation("my name").single()))
             val song1 = factory.insertSong(album = album)
             factory.insertSong()
-            val result = songRepositoryJpa.findByAlbumName("my name", SongRaw::class).unsafeRunSync()
+            val result = songRepositoryJpa.findByAlbumName("my name", SongRaw::class,
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelRaw(song1))
         }
 
         "find by album name sorted by song name with default direction" {
+            val pagination = Pagination(sort = listOf("name"))
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(Arb.albumCreation("my name").single()))
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByAlbumName("my name", SongBase::class,
-                    sort = listOf("name")).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelBase(it) }
         }
 
         "find by album name sorted by song name with asc direction" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(Arb.albumCreation("my name").single()))
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByAlbumName("my name", SongRaw::class,
-                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelRaw(it) }
         }
 
         "find by group id" {
+            val pagination = Pagination()
             val song1 = factory.insertSong()
             factory.insertSong()
-            val result = songRepositoryJpa.findByGroupId(song1.album.group.id, SongWithAlbumAndGroup::class).unsafeRunSync()
+            val result = songRepositoryJpa.findByGroupId(song1.album.group.id, SongWithAlbumAndGroup::class,
+            pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelWithAlbumAndGroup(song1))
         }
         "find by group id sorted by song name with default direction" {
+            val pagination = Pagination(sort = listOf("name"))
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByGroupId(album.groupId, SongWithAlbumAndGroup::class,
-                    sort = listOf("name")).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
         }
 
         "find by group id sorted by song name with asc direction" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum())
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByGroupId(album.groupId, SongWithAlbumAndGroup::class,
-                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
         }
 
         "find by group name" {
+            val pagination = Pagination()
             val song1 = factory.insertSong()
             factory.insertSong()
-            val result = songRepositoryJpa.findByGroupName(song1.album.group.name, SongWithAlbumAndGroup::class).unsafeRunSync()
+            val result = songRepositoryJpa.findByGroupName(song1.album.group.name,
+                    SongWithAlbumAndGroup::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(SongEntityJpa.toModelWithAlbumAndGroup(song1))
         }
 
         "find by group name sorted by song name with default direction" {
+            val pagination = Pagination(sort = listOf("name"))
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(group = group))
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByGroupName(group.name, SongWithAlbumAndGroup::class,
-                    sort = listOf("name")).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song2, song1).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
         }
 
         "find by group name sorted by song name with asc direction" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
             val album = AlbumEntityJpa.toModelRaw(factory.insertAlbum(group = group))
             val song1 = factory.insertSong(Arb.songCreation(name = "a").single(), album)
             val song2 = factory.insertSong(Arb.songCreation(name = "b").single(), album)
             factory.insertSong(Arb.songCreation().single())
             val result = songRepositoryJpa.findByGroupName(group.name, SongWithAlbumAndGroup::class,
-                    sort = listOf("name"), sortDir = SortDir.ASC).unsafeRunSync()
+                    pagination).unsafeRunSync()
 
             result.content shouldBe listOf(song1, song2).map { SongEntityJpa.toModelWithAlbumAndGroup(it) }
         }

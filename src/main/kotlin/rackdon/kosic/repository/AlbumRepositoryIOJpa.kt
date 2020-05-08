@@ -12,13 +12,11 @@ import rackdon.kosic.model.AlbumCreation
 import rackdon.kosic.model.AlbumRaw
 import rackdon.kosic.model.AlbumWithGroup
 import rackdon.kosic.model.GroupNotFound
-import rackdon.kosic.model.PageSize
-import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
 import java.util.Optional
 import java.util.UUID
 import kotlin.reflect.KClass
-import rackdon.kosic.model.Page as AlbumPage
+import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
 interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
@@ -29,7 +27,7 @@ interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
 
 @Repository
 class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) :
-    AlbumRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
+    AlbumRepository<ForIO, ForIO, ForPageK> {
 
     private fun getTransformer(projection: KClass<out Album>): (albumEntityJpa: AlbumEntityJpa) -> Album {
         return { albumJpa -> when (projection) {
@@ -50,9 +48,8 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
         }
     }
 
-    override fun findAll(projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize, sort: List<String>,
-            sortDir: SortDir): IO<PageK<out Album>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+    override fun findAll(projection: KClass<out Album>, pagination: ModelPagination): IO<PageK<out Album>> {
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { albumJpa.findAll(pageRequest).map { transformer(it) }.k() }
     }
@@ -67,15 +64,13 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
         return IO { albumJpa.findByName(name).map { Option.just(transformer(it)) }.orElse(Option.empty()) }
     }
 
-    override fun findByGroupId(groupId: UUID, projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize,
-            sort: List<String>, sortDir: SortDir): IO<PageK<out Album>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+    override fun findByGroupId(groupId: UUID, projection: KClass<out Album>, pagination: ModelPagination): IO<PageK<out Album>> {
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { albumJpa.findByGroupId(groupId, pageRequest).map { transformer(it) }.k() }
     }
-    override fun findByGroupName(groupName: String, projection: KClass<out Album>, page: AlbumPage, pageSize: PageSize,
-            sort: List<String>, sortDir: SortDir): IO<PageK<out Album>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+    override fun findByGroupName(groupName: String, projection: KClass<out Album>, pagination: ModelPagination): IO<PageK<out Album>> {
+        val pageRequest = Pagination.getPageRequest(pagination)
         val finalProjection = getTransformer(projection)
         return IO { albumJpa.findByGroupName(groupName, pageRequest).map { finalProjection(it) }.k() }
     }

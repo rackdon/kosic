@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl
 import rackdon.kosic.model.AlbumRaw
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.PageSize
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.AlbumRepositoryIOJpa
 import rackdon.kosic.repository.k
@@ -48,15 +49,15 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
             val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
+            val pagination = Pagination()
 
-            every { albumRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findAll(any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbums(projection, None, None, None, None).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
 
-            verify(exactly = 1) { albumRepositoryMock.findAll(projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { albumRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get Albums is called with all values and return albums with pages" {
@@ -68,13 +69,14 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { albumRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findAll(any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbums(projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
-            verify(exactly = 1) { albumRepositoryMock.findAll(projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { albumRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get album by id return IO option of the specified album projection" {
@@ -105,15 +107,15 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
             val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
+            val pagination = Pagination()
 
-            every { albumRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findByGroupId(any(), any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbumsByGroupId(groupId, projection, None, None, None, None).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
 
-            verify(exactly = 1) { albumRepositoryMock.findByGroupId(groupId, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { albumRepositoryMock.findByGroupId(groupId, projection, pagination) }
         }
 
         "Get Albums by group id is called with all values and return albums with pages" {
@@ -126,13 +128,14 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { albumRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findByGroupId(any(), any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbumsByGroupId(groupId, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
-            verify(exactly = 1) { albumRepositoryMock.findByGroupId(groupId, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { albumRepositoryMock.findByGroupId(groupId, projection, pagination) }
         }
 
         "Get Albums by group name is called projection and None values and return albums with pages" {
@@ -141,15 +144,15 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val albumPage: Page<AlbumRaw> = PageImpl(albumList)
             val ioAlbumRaw = IO { albumPage.k() }
             val projection = AlbumRaw::class
+            val pagination = Pagination()
 
-            every { albumRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findByGroupName(any(), any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbumsByGroupName(groupName, projection, None, None, None, None).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
 
-            verify(exactly = 1) { albumRepositoryMock.findByGroupName(groupName, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { albumRepositoryMock.findByGroupName(groupName, projection, pagination) }
         }
 
         "Get Albums by group name is called with all values and return albums with pages" {
@@ -162,13 +165,14 @@ class AlbumServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { albumRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioAlbumRaw
+            every { albumRepositoryMock.findByGroupName(any(), any(), any()) } returns ioAlbumRaw
 
             val albumsResult = albumService.getAlbumsByGroupName(groupName, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             albumsResult shouldBe DataWithPages(albumList, 1u)
-            verify(exactly = 1) { albumRepositoryMock.findByGroupName(groupName, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { albumRepositoryMock.findByGroupName(groupName, projection, pagination) }
         }
     }
 }

@@ -11,7 +11,7 @@ import rackdon.kosic.model.SortDir
 import java.util.UUID
 import kotlin.reflect.KClass
 
-interface SongService<T> : PaginationService {
+interface SongService<T> {
     fun createSong(songCreation: SongCreation): Kind<T, Song>
     fun getSongs(projection: KClass<out Song>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>

@@ -9,17 +9,16 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.AlbumNotFound
-import rackdon.kosic.model.PageSize
 import rackdon.kosic.model.Song
 import rackdon.kosic.model.SongCreation
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SongWithAlbum
 import rackdon.kosic.model.SongWithAlbumAndGroup
-import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.SongEntityJpa
 import java.util.Optional
 import java.util.UUID
 import kotlin.reflect.KClass
+import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
 interface SongJpa : JpaRepository<SongEntityJpa, UUID> {
@@ -34,7 +33,7 @@ interface SongJpa : JpaRepository<SongEntityJpa, UUID> {
 
 @Repository
 class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: AlbumJpa) :
-    SongRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
+    SongRepository<ForIO, ForIO, ForPageK> {
 
     private fun getTransformer(projection: KClass<out Song>): (songEntityJpa: SongEntityJpa) -> Song {
         return { songJpa -> when (projection) {
@@ -56,10 +55,8 @@ class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: Al
         }
     }
 
-    override fun findAll(projection: KClass<out Song>, page: rackdon.kosic.model.Page, pageSize: PageSize,
-            sort: List<String>, sortDir: SortDir
-    ): IO<PageK<out Song>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+    override fun findAll(projection: KClass<out Song>, pagination: ModelPagination): IO<PageK<out Song>> {
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { songJpa.findAll(pageRequest).map { transformer(it) }.k() }
     }
@@ -74,32 +71,28 @@ class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: Al
         return IO { songJpa.findByName(name).map { Option.just(transformer(it)) }.orElse(Option.empty()) }
     }
 
-    override fun findByAlbumId(albumId: UUID, projection: KClass<out Song>, page: rackdon.kosic.model.Page,
-            pageSize: PageSize, sort: List<String>, sortDir: SortDir
+    override fun findByAlbumId(albumId: UUID, projection: KClass<out Song>, pagination: ModelPagination
     ): IO<PageK<out Song>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { songJpa.findByAlbumId(albumId, pageRequest).map { transformer(it) }.k() }
     }
-    override fun findByAlbumName(albumName: String, projection: KClass<out Song>, page: rackdon.kosic.model.Page,
-            pageSize: PageSize, sort: List<String>, sortDir: SortDir
+    override fun findByAlbumName(albumName: String, projection: KClass<out Song>, pagination: ModelPagination
     ): IO<PageK<out Song>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val pageRequest = Pagination.getPageRequest(pagination)
         val finalProjection = getTransformer(projection)
         return IO { songJpa.findByAlbumName(albumName, pageRequest).map { finalProjection(it) }.k() }
     }
 
-    override fun findByGroupId(groupId: UUID, projection: KClass<out Song>, page: rackdon.kosic.model.Page,
-            pageSize: PageSize, sort: List<String>, sortDir: SortDir
+    override fun findByGroupId(groupId: UUID, projection: KClass<out Song>, pagination: ModelPagination
     ): IO<PageK<out Song>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { songJpa.findByGroupId(groupId, pageRequest).map { transformer(it) }.k() }
     }
-    override fun findByGroupName(groupName: String, projection: KClass<out Song>, page: rackdon.kosic.model.Page,
-            pageSize: PageSize, sort: List<String>, sortDir: SortDir
+    override fun findByGroupName(groupName: String, projection: KClass<out Song>, pagination: ModelPagination
     ): IO<PageK<out Song>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+        val pageRequest = Pagination.getPageRequest(pagination)
         val finalProjection = getTransformer(projection)
         return IO { songJpa.findByGroupName(groupName, pageRequest).map { finalProjection(it) }.k() }
     }

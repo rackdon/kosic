@@ -11,7 +11,7 @@ import rackdon.kosic.model.SortDir
 import java.util.UUID
 import kotlin.reflect.KClass
 
-interface AlbumService<T> : PaginationService {
+interface AlbumService<T> {
     fun createAlbum(albumCreation: AlbumCreation): Kind<T, Album>
     fun getAlbums(projection: KClass<out Album>, page: Option<Page>, pageSize: Option<PageSize>,
             sort: Option<List<String>>, sortDir: Option<SortDir>): Kind<T, DataWithPages<Album>>

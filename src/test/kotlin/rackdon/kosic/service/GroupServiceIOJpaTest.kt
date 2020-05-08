@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.GroupRaw
 import rackdon.kosic.model.PageSize
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.GroupRepositoryIOJpa
 import rackdon.kosic.repository.k
@@ -48,15 +49,15 @@ class GroupServiceIOJpaTest : StringSpec() {
             val groupPage: Page<GroupRaw> = PageImpl(groupList)
             val ioGroupRaw = IO { groupPage.k() }
             val projection = GroupRaw::class
+            val pagination = Pagination()
 
-            every { groupRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioGroupRaw
+            every { groupRepositoryMock.findAll(any(), any()) } returns ioGroupRaw
 
             val groupsResult = groupService.getGroups(projection, None, None, None, None).unsafeRunSync()
 
             groupsResult shouldBe DataWithPages(groupList, 1u)
 
-            verify(exactly = 1) { groupRepositoryMock.findAll(projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { groupRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get Groups is called with all values and return groups with pages" {
@@ -68,13 +69,14 @@ class GroupServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { groupRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioGroupRaw
+            every { groupRepositoryMock.findAll(any(), any()) } returns ioGroupRaw
 
             val groupsResult = groupService.getGroups(projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             groupsResult shouldBe DataWithPages(groupList, 1u)
-            verify(exactly = 1) { groupRepositoryMock.findAll(projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { groupRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get group by id return IO option of the specified group projection" {

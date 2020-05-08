@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.PageSize
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SongRaw
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.SongRepositoryIOJpa
@@ -48,15 +49,15 @@ class SongServiceIOJpaTest : StringSpec() {
             val songPage: Page<SongRaw> = PageImpl(songList)
             val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
+            val pagination = Pagination()
 
-            every { songRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findAll(any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongs(projection, None, None, None, None).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
 
-            verify(exactly = 1) { songRepositoryMock.findAll(projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { songRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get Songs is called with all values and return songs with pages" {
@@ -68,13 +69,14 @@ class SongServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { songRepositoryMock.findAll(any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findAll(any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongs(projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
-            verify(exactly = 1) { songRepositoryMock.findAll(projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { songRepositoryMock.findAll(projection, pagination) }
         }
 
         "Get song by id return IO option of the specified song projection" {
@@ -105,15 +107,15 @@ class SongServiceIOJpaTest : StringSpec() {
             val songPage: Page<SongRaw> = PageImpl(songList)
             val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
+            val pagination = Pagination()
 
-            every { songRepositoryMock.findByAlbumId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByAlbumId(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByAlbumId(albumId, projection, None, None, None, None).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
 
-            verify(exactly = 1) { songRepositoryMock.findByAlbumId(albumId, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { songRepositoryMock.findByAlbumId(albumId, projection, pagination) }
         }
 
         "Get Songs by album id is called with all values and return songs with pages" {
@@ -126,13 +128,14 @@ class SongServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { songRepositoryMock.findByAlbumId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByAlbumId(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByAlbumId(albumId, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
-            verify(exactly = 1) { songRepositoryMock.findByAlbumId(albumId, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { songRepositoryMock.findByAlbumId(albumId, projection, pagination) }
         }
 
         "Get Songs by album name is called projection and None values and return songs with pages" {
@@ -141,15 +144,15 @@ class SongServiceIOJpaTest : StringSpec() {
             val songPage: Page<SongRaw> = PageImpl(songList)
             val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
+            val pagination = Pagination()
 
-            every { songRepositoryMock.findByAlbumName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByAlbumName(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByAlbumName(albumName, projection, None, None, None, None).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
 
-            verify(exactly = 1) { songRepositoryMock.findByAlbumName(albumName, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { songRepositoryMock.findByAlbumName(albumName, projection, pagination) }
         }
 
         "Get Songs by album name is called with all values and return songs with pages" {
@@ -162,13 +165,14 @@ class SongServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { songRepositoryMock.findByAlbumName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByAlbumName(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByAlbumName(albumName, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
-            verify(exactly = 1) { songRepositoryMock.findByAlbumName(albumName, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { songRepositoryMock.findByAlbumName(albumName, projection, pagination) }
         }
 
         "Get Songs by group id is called projection and None values and return songs with pages" {
@@ -177,15 +181,15 @@ class SongServiceIOJpaTest : StringSpec() {
             val songPage: Page<SongRaw> = PageImpl(songList)
             val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
+            val pagination = Pagination()
 
-            every { songRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByGroupId(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByGroupId(groupId, projection, None, None, None, None).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
 
-            verify(exactly = 1) { songRepositoryMock.findByGroupId(groupId, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { songRepositoryMock.findByGroupId(groupId, projection, pagination) }
         }
 
         "Get Songs by group id is called with all values and return songs with pages" {
@@ -198,13 +202,14 @@ class SongServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { songRepositoryMock.findByGroupId(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByGroupId(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByGroupId(groupId, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
-            verify(exactly = 1) { songRepositoryMock.findByGroupId(groupId, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { songRepositoryMock.findByGroupId(groupId, projection, pagination) }
         }
 
         "Get Songs by group name is called projection and None values and return songs with pages" {
@@ -213,15 +218,15 @@ class SongServiceIOJpaTest : StringSpec() {
             val songPage: Page<SongRaw> = PageImpl(songList)
             val ioSongRaw = IO { songPage.k() }
             val projection = SongRaw::class
+            val pagination = Pagination()
 
-            every { songRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByGroupName(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByGroupName(groupName, projection, None, None, None, None).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
 
-            verify(exactly = 1) { songRepositoryMock.findByGroupName(groupName, projection, ServicePage(0u), PageSize(10u),
-                    emptyList(), SortDir.DESC) }
+            verify(exactly = 1) { songRepositoryMock.findByGroupName(groupName, projection, pagination) }
         }
 
         "Get Songs by group name is called with all values and return songs with pages" {
@@ -234,13 +239,14 @@ class SongServiceIOJpaTest : StringSpec() {
             val pageSize = PageSize(20u)
             val sort = listOf("name")
             val sortDir = SortDir.ASC
+            val pagination = Pagination(page, pageSize, sort, sortDir)
 
-            every { songRepositoryMock.findByGroupName(any(), any(), any(), any(), any(), any()) } returns ioSongRaw
+            every { songRepositoryMock.findByGroupName(any(), any(), any()) } returns ioSongRaw
 
             val songsResult = songService.getSongsByGroupName(groupName, projection, Some(page), Some(pageSize), Some(sort), Some(sortDir)).unsafeRunSync()
 
             songsResult shouldBe DataWithPages(songList, 1u)
-            verify(exactly = 1) { songRepositoryMock.findByGroupName(groupName, projection, page, pageSize, sort, sortDir) }
+            verify(exactly = 1) { songRepositoryMock.findByGroupName(groupName, projection, pagination) }
         }
     }
 }

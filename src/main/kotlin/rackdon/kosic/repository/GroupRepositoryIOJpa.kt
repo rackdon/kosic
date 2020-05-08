@@ -8,13 +8,11 @@ import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Group
 import rackdon.kosic.model.GroupCreation
 import rackdon.kosic.model.GroupRaw
-import rackdon.kosic.model.PageSize
-import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import java.util.Optional
 import java.util.UUID
 import kotlin.reflect.KClass
-import rackdon.kosic.model.Page as GroupPage
+import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
 interface GroupJpa : JpaRepository<GroupEntityJpa, UUID> {
@@ -22,7 +20,7 @@ interface GroupJpa : JpaRepository<GroupEntityJpa, UUID> {
 }
 
 @Repository
-class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO, ForIO, ForPageK>, PaginationRepository {
+class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO, ForIO, ForPageK> {
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityJpa: GroupEntityJpa) -> Group {
         return { groupJpa -> when (projection) {
@@ -39,9 +37,8 @@ class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<For
         }
     }
 
-    override fun findAll(projection: KClass<out Group>, page: GroupPage, pageSize: PageSize, sort: List<String>,
-            sortDir: SortDir): IO<PageK<out Group>> {
-        val pageRequest = getPageRequest(page, pageSize, sort, sortDir)
+    override fun findAll(projection: KClass<out Group>, pagination: ModelPagination): IO<PageK<out Group>> {
+        val pageRequest = Pagination.getPageRequest(pagination)
         val transformer = getTransformer(projection)
         return IO { groupJpa.findAll(pageRequest).map { transformer(it) }.k() }
     }

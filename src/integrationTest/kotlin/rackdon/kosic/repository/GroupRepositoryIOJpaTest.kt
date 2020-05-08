@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.annotation.Rollback
 import rackdon.kosic.model.GroupCreation
 import rackdon.kosic.model.GroupRaw
+import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SortDir
 import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
@@ -53,24 +54,27 @@ class GroupRepositoryIOJpaTest(entityManager: EntityManager, groupJpa: GroupJpa)
         }
 
         "find all groups" {
+            val pagination = Pagination()
             val group = factory.insertGroup()
-            val result = groupRepositoryJpa.findAll(GroupRaw::class).unsafeRunSync()
+            val result = groupRepositoryJpa.findAll(GroupRaw::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(GroupEntityJpa.toModelRaw(group))
         }
 
         "find all groups sorted by name with default direction" {
+            val pagination = Pagination(sort = listOf("name"))
             val group1 = factory.insertGroup(Arb.groupCreation(name = "a").single())
             val group2 = factory.insertGroup(Arb.groupCreation(name = "b").single())
-            val result = groupRepositoryJpa.findAll(GroupRaw::class, sort = listOf("name")).unsafeRunSync()
+            val result = groupRepositoryJpa.findAll(GroupRaw::class, pagination).unsafeRunSync()
 
             result.content shouldBe listOf(group2, group1).map { GroupEntityJpa.toModelRaw(it) }
         }
 
         "find all groups sorted by name with asc direction" {
+            val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
             val group1 = factory.insertGroup(Arb.groupCreation(name = "a").single())
             val group2 = factory.insertGroup(Arb.groupCreation(name = "b").single())
-            val result = groupRepositoryJpa.findAll(GroupRaw::class, sort = listOf("name"), sortDir = SortDir.ASC)
+            val result = groupRepositoryJpa.findAll(GroupRaw::class, pagination)
                 .unsafeRunSync()
 
             result.content shouldBe listOf(group1, group2).map { GroupEntityJpa.toModelRaw(it) }

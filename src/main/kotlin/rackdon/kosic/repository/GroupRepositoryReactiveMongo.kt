@@ -13,13 +13,12 @@ import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Group
 import rackdon.kosic.model.GroupCreation
 import rackdon.kosic.model.GroupRaw
-import rackdon.kosic.model.Page
-import rackdon.kosic.model.PageSize
-import rackdon.kosic.model.SortDir
+import rackdon.kosic.repository.Pagination.paginated
 import rackdon.kosic.repository.entity.mongo.GroupEntityMongo
 import reactor.core.publisher.Mono
 import java.util.UUID
 import kotlin.reflect.KClass
+import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
 interface GroupMongo : ReactiveMongoRepository<GroupEntityMongo, UUID> {
@@ -27,7 +26,7 @@ interface GroupMongo : ReactiveMongoRepository<GroupEntityMongo, UUID> {
 }
 
 class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) :
-    GroupRepository<ForMonoK, ForFluxK, ForId>, PaginationRepository {
+    GroupRepository<ForMonoK, ForFluxK, ForId> {
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityMongo: GroupEntityMongo) -> Group {
         return { groupMongo -> when (projection) {
@@ -42,12 +41,11 @@ class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) :
             .map { GroupEntityMongo.toModelRaw(it) }.k()
     }
 
-    override fun findAll(projection: KClass<out Group>, page: Page, pageSize: PageSize, sort: List<String>,
-            sortDir: SortDir): FluxK<Id<Group>> {
-        val finalSort = getSort(sort, sortDir)
+    override fun findAll(projection: KClass<out Group>, pagination: ModelPagination): FluxK<Id<Group>> {
+        val finalSort = Pagination.getSort(pagination.sort, pagination.sortDir)
         val transformer = getTransformer(projection)
         return groupMongo.findAll(finalSort)
-            .paginated(page, pageSize)
+            .paginated(pagination.page, pagination.pageSize)
             .map { Id.just(transformer(it)) }.k()
     }
 
