@@ -49,6 +49,10 @@ class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) :
             .map { Id.just(transformer(it)) }.k()
     }
 
+    fun countAll(): MonoK<Int> {
+        return groupMongo.count().map { it.toInt() }.k()
+    }
+
     override fun findById(id: UUID, projection: KClass<out Group>): MonoK<Option<Group>> {
         val transformer = getTransformer(projection)
         return groupMongo.findById(id).map { Option.just(transformer(it)) }.defaultIfEmpty(Option.empty()).k()

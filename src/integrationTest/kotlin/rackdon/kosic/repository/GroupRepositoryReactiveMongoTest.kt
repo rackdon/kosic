@@ -10,6 +10,7 @@ import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.single
+import io.kotest.property.arbitrary.take
 import io.kotest.spring.SpringListener
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
@@ -86,6 +87,21 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
                 .block()
 
             result?.map { it.value() } shouldBe listOf(group1, group2).map { GroupEntityMongo.toModelRaw(it) }
+        }
+
+        "count all groups return the correct result" {
+            Arb.groupCreation().take(3).forEach { factory.insertGroup(it) }
+
+            val result = groupRepositoryMongo.countAll().unsafeRunSync()
+
+            result shouldBe 3
+        }
+
+        "count all groups return 0 if no groups" {
+
+            val result = groupRepositoryMongo.countAll().unsafeRunSync()
+
+            result shouldBe 0
         }
 
         "find by id return correct group" {
