@@ -34,9 +34,9 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
 
     private fun getTransformer(projection: KClass<out Album>): (albumEntityJpa: AlbumEntityJpa) -> Album {
         return { albumJpa -> when (projection) {
-            AlbumRaw::class -> AlbumEntityJpa.toModelRaw(albumJpa)
-            AlbumWithGroup::class -> AlbumEntityJpa.toModelWithGroup(albumJpa)
-            else -> AlbumEntityJpa.toModelBase(albumJpa)
+            AlbumRaw::class -> albumJpa.toModelRaw()
+            AlbumWithGroup::class -> albumJpa.toModelWithGroup()
+            else -> albumJpa.toModelBase()
         }
         }
     }
@@ -46,7 +46,7 @@ class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa:
             val groupJpa = groupJpa.findById(albumCreation.groupId)
             groupJpa.map {
                 val album = albumJpa.save(AlbumEntityJpa.fromCreation(albumCreation, it))
-                AlbumEntityJpa.toModelRaw(album)
+                album.toModelRaw()
             }.orElseThrow { GroupNotFound }
         }
     }

@@ -21,6 +21,13 @@ data class GroupEntityJpa(
         val createdOn: LocalDateTime = LocalDateTime.now(),
         val dissolvedOn: LocalDateTime? = null
 ) {
+        fun toModelRaw() =
+                GroupRaw(id = this.id,
+                        name = this.name,
+                        members = this.members.toUInt(),
+                        createdOn = this.createdOn,
+                        dissolvedOn = this.dissolvedOn)
+
         companion object {
                 fun fromCreation(groupCreation: GroupCreation) =
                         GroupEntityJpa(
@@ -28,12 +35,5 @@ data class GroupEntityJpa(
                                 members = groupCreation.members.toInt(),
                                 createdOn = groupCreation.createdOn,
                                 dissolvedOn = groupCreation.dissolvedOn)
-
-                fun toModelRaw(groupEntityJpa: GroupEntityJpa) =
-                        GroupRaw(id = groupEntityJpa.id,
-                                name = groupEntityJpa.name,
-                                members = groupEntityJpa.members.toUInt(),
-                                createdOn = groupEntityJpa.createdOn,
-                                dissolvedOn = groupEntityJpa.dissolvedOn)
         }
 }

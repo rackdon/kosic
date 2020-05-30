@@ -32,15 +32,15 @@ class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) : GroupRe
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityMongo: GroupEntityMongo) -> Group {
         return { groupMongo -> when (projection) {
-            GroupRaw::class -> GroupEntityMongo.toModelRaw(groupMongo)
-            else -> GroupEntityMongo.toModelRaw(groupMongo)
+            GroupRaw::class -> groupMongo.toModelRaw()
+            else -> groupMongo.toModelRaw()
         }
         }
     }
 
     override fun save(groupCreation: GroupCreation): MonoK<GroupRaw> {
         return groupMongo.save(GroupEntityMongo.fromCreation(groupCreation))
-            .map { GroupEntityMongo.toModelRaw(it) }.k()
+            .map { it.toModelRaw() }.k()
     }
 
     override fun findAll(projection: KClass<out Group>, pagination: ModelPagination): FluxK<Id<Group>> {

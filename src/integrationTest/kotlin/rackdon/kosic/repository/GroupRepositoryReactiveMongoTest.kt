@@ -18,7 +18,6 @@ import rackdon.kosic.model.GroupCreation
 import rackdon.kosic.model.GroupRaw
 import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SortDir
-import rackdon.kosic.repository.entity.mongo.GroupEntityMongo
 import rackdon.kosic.utils.DatabaseCleanerMongo
 import rackdon.kosic.utils.FactoryMongo
 import rackdon.kosic.utils.generator.groupCreation
@@ -62,7 +61,7 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
                 .collectList()
                 .block()
 
-            result?.map { it.value() } shouldBe listOf(GroupEntityMongo.toModelRaw(group))
+            result?.map { it.value() } shouldBe listOf(group.toModelRaw())
         }
 
         "find all groups sorted by name with default direction" {
@@ -74,7 +73,7 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
                 .collectList()
                 .block()
 
-            result?.map { it.value() } shouldBe listOf(group2, group1).map { GroupEntityMongo.toModelRaw(it) }
+            result?.map { it.value() } shouldBe listOf(group2, group1).map { it.toModelRaw() }
         }
 
         "find all groups sorted by name with asc direction" {
@@ -86,7 +85,7 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
                 .collectList()
                 .block()
 
-            result?.map { it.value() } shouldBe listOf(group1, group2).map { GroupEntityMongo.toModelRaw(it) }
+            result?.map { it.value() } shouldBe listOf(group1, group2).map { it.toModelRaw() }
         }
 
         "count all groups return the correct result" {
@@ -108,7 +107,7 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
             val group = factory.insertGroup()
             val result = groupRepositoryMongo.findById(group.id, GroupRaw::class).unsafeRunSync()
 
-            result shouldBe Some(GroupEntityMongo.toModelRaw(group))
+            result shouldBe Some(group.toModelRaw())
         }
 
         "find by id return None if not exists" {
@@ -121,7 +120,7 @@ class GroupRepositoryReactiveMongoTest(groupMongo: GroupMongo, reactiveMongoTemp
             val group = factory.insertGroup()
             val result = groupRepositoryMongo.findByName(group.name, GroupRaw::class).unsafeRunSync()
 
-            result shouldBe Some(GroupEntityMongo.toModelRaw(group))
+            result shouldBe Some(group.toModelRaw())
         }
 
         "find by name return None if not exists" {

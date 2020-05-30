@@ -25,6 +25,26 @@ data class AlbumEntityJpa(
         val group: GroupEntityJpa = GroupEntityJpa(),
         val createdOn: LocalDateTime = LocalDateTime.now()
 ) {
+
+        fun toModelRaw() =
+                AlbumRaw(
+                        id = this.id,
+                        name = this.name,
+                        groupId = this.group.id,
+                        createdOn = this.createdOn)
+
+        fun toModelBase() =
+                AlbumBase(
+                        name = this.name,
+                        createdOn = this.createdOn)
+
+        fun toModelWithGroup() =
+                AlbumWithGroup(
+                        id = this.id,
+                        name = this.name,
+                        group = this.group.toModelRaw(),
+                        createdOn = this.createdOn)
+
         companion object {
                 fun fromCreation(albumCreation: AlbumCreation, groupEntityJpa: GroupEntityJpa): AlbumEntityJpa {
                         require(albumCreation.groupId == groupEntityJpa.id) {
@@ -36,24 +56,5 @@ data class AlbumEntityJpa(
                                 group = groupEntityJpa,
                                 createdOn = albumCreation.createdOn)
                 }
-
-                fun toModelRaw(albumEntityJpa: AlbumEntityJpa) =
-                        AlbumRaw(
-                                id = albumEntityJpa.id,
-                                name = albumEntityJpa.name,
-                                groupId = albumEntityJpa.group.id,
-                                createdOn = albumEntityJpa.createdOn)
-
-                fun toModelBase(albumEntityJpa: AlbumEntityJpa) =
-                        AlbumBase(
-                                name = albumEntityJpa.name,
-                                createdOn = albumEntityJpa.createdOn)
-
-                fun toModelWithGroup(albumEntityJpa: AlbumEntityJpa) =
-                        AlbumWithGroup(
-                                id = albumEntityJpa.id,
-                                name = albumEntityJpa.name,
-                                group = GroupEntityJpa.toModelRaw(albumEntityJpa.group),
-                                createdOn = albumEntityJpa.createdOn)
         }
 }

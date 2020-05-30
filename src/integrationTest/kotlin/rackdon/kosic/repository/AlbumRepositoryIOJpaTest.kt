@@ -20,8 +20,6 @@ import rackdon.kosic.model.AlbumWithGroup
 import rackdon.kosic.model.GroupNotFound
 import rackdon.kosic.model.Pagination
 import rackdon.kosic.model.SortDir
-import rackdon.kosic.repository.entity.jpa.AlbumEntityJpa
-import rackdon.kosic.repository.entity.jpa.GroupEntityJpa
 import rackdon.kosic.utils.DatabaseCleanerPsql
 import rackdon.kosic.utils.FactoryJpa
 import rackdon.kosic.utils.generator.albumCreation
@@ -72,7 +70,7 @@ class AlbumRepositoryIOJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa,
 
             val result = albumRepositoryJpa.findAll(AlbumRaw::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(AlbumEntityJpa.toModelRaw(album))
+            result.content shouldBe listOf(album.toModelRaw())
         }
 
         "find all albums returning albums with groups projection" {
@@ -80,35 +78,35 @@ class AlbumRepositoryIOJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa,
             val album = factory.insertAlbum()
             val result = albumRepositoryJpa.findAll(AlbumWithGroup::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(AlbumEntityJpa.toModelWithGroup(album))
+            result.content shouldBe listOf(album.toModelWithGroup())
         }
 
         "find all albums sorted by name with default direction and album base projection" {
             val pagination = Pagination(sort = listOf("name"))
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val group = factory.insertGroup().toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
 
             val result = albumRepositoryJpa.findAll(AlbumBase::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album2, album1).map { AlbumEntityJpa.toModelBase(it) }
+            result.content shouldBe listOf(album2, album1).map { it.toModelBase() }
         }
 
         "find all albums sorted by name with asc direction and album raw projection" {
             val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val group = factory.insertGroup().toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             val result = albumRepositoryJpa.findAll(AlbumRaw::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album1, album2).map { AlbumEntityJpa.toModelRaw(it) }
+            result.content shouldBe listOf(album1, album2).map { it.toModelRaw() }
         }
 
         "find by id return correct album with base projection" {
             val album = factory.insertAlbum()
             val result = albumRepositoryJpa.findById(album.id, projection = AlbumBase::class).unsafeRunSync()
 
-            result shouldBe Some(AlbumEntityJpa.toModelBase(album))
+            result shouldBe Some(album.toModelBase())
         }
 
         "find by id return None if not exists" {
@@ -121,7 +119,7 @@ class AlbumRepositoryIOJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa,
             val album = factory.insertAlbum()
             val result = albumRepositoryJpa.findByName(album.name, projection = AlbumRaw::class).unsafeRunSync()
 
-            result shouldBe Some(AlbumEntityJpa.toModelRaw(album))
+            result shouldBe Some(album.toModelRaw())
         }
 
         "find by name return None if not exists" {
@@ -136,23 +134,23 @@ class AlbumRepositoryIOJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa,
             factory.insertAlbum()
             val result = albumRepositoryJpa.findByGroupId(album1.group.id, AlbumWithGroup::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(AlbumEntityJpa.toModelWithGroup(album1))
+            result.content shouldBe listOf(album1.toModelWithGroup())
         }
 
         "find by group id sorted by album name with default direction" {
             val pagination = Pagination(sort = listOf("name"))
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val group = factory.insertGroup().toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum()
             val result = albumRepositoryJpa.findByGroupId(group.id, AlbumBase::class, pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album2, album1).map { AlbumEntityJpa.toModelBase(it) }
+            result.content shouldBe listOf(album2, album1).map { it.toModelBase() }
         }
 
         "find by group id sorted by album name with asc direction" {
             val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup())
+            val group = factory.insertGroup().toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum()
@@ -160,42 +158,42 @@ class AlbumRepositoryIOJpaTest(entityManager: EntityManager, albumJpa: AlbumJpa,
             val result = albumRepositoryJpa.findByGroupId(group.id, AlbumWithGroup::class,
                     pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album1, album2).map { AlbumEntityJpa.toModelWithGroup(it) }
+            result.content shouldBe listOf(album1, album2).map { it.toModelWithGroup() }
         }
 
         "find by group name" {
             val pagination = Pagination()
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
+            val group = factory.insertGroup(Arb.groupCreation("my name").single()).toModelRaw()
             val album1 = factory.insertAlbum(group = group)
             factory.insertAlbum()
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumRaw::class,
                     pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(AlbumEntityJpa.toModelRaw(album1))
+            result.content shouldBe listOf(album1.toModelRaw())
         }
 
         "find by group name sorted by album name with default direction" {
             val pagination = Pagination(sort = listOf("name"))
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
+            val group = factory.insertGroup(Arb.groupCreation("my name").single()).toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum(Arb.albumCreation().single())
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumBase::class,
                     pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album2, album1).map { AlbumEntityJpa.toModelBase(it) }
+            result.content shouldBe listOf(album2, album1).map { it.toModelBase() }
         }
 
         "find by group name sorted by album name with asc direction" {
             val pagination = Pagination(sort = listOf("name"), sortDir = SortDir.ASC)
-            val group = GroupEntityJpa.toModelRaw(factory.insertGroup(Arb.groupCreation("my name").single()))
+            val group = factory.insertGroup(Arb.groupCreation("my name").single()).toModelRaw()
             val album1 = factory.insertAlbum(Arb.albumCreation(name = "a").single(), group)
             val album2 = factory.insertAlbum(Arb.albumCreation(name = "b").single(), group)
             factory.insertAlbum(Arb.albumCreation().single())
             val result = albumRepositoryJpa.findByGroupName("my name", AlbumRaw::class,
                     pagination).unsafeRunSync()
 
-            result.content shouldBe listOf(album1, album2).map { AlbumEntityJpa.toModelRaw(it) }
+            result.content shouldBe listOf(album1, album2).map { it.toModelRaw() }
         }
     }
 }

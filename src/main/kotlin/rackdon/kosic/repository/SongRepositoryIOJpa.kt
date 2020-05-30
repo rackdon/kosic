@@ -40,10 +40,10 @@ class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: Al
 
     private fun getTransformer(projection: KClass<out Song>): (songEntityJpa: SongEntityJpa) -> Song {
         return { songJpa -> when (projection) {
-            SongRaw::class -> SongEntityJpa.toModelRaw(songJpa)
-            SongWithAlbum::class -> SongEntityJpa.toModelWithAlbum(songJpa)
-            SongWithAlbumAndGroup::class -> SongEntityJpa.toModelWithAlbumAndGroup(songJpa)
-            else -> SongEntityJpa.toModelBase(songJpa)
+            SongRaw::class -> songJpa.toModelRaw()
+            SongWithAlbum::class -> songJpa.toModelWithAlbum()
+            SongWithAlbumAndGroup::class -> songJpa.toModelWithAlbumAndGroup()
+            else -> songJpa.toModelBase()
         }
         }
     }
@@ -53,7 +53,7 @@ class SongRepositoryIOJpa(private val songJpa: SongJpa, private val albumJpa: Al
             val albumJpa = albumJpa.findById(songCreation.albumId)
             albumJpa.map {
                 val song = songJpa.save(SongEntityJpa.fromCreation(songCreation, it))
-                SongEntityJpa.toModelRaw(song)
+                song.toModelRaw()
             }.orElseThrow { AlbumNotFound }
         }
     }

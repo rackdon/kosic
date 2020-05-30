@@ -27,8 +27,8 @@ class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<For
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityJpa: GroupEntityJpa) -> Group {
         return { groupJpa -> when (projection) {
-            GroupRaw::class -> GroupEntityJpa.toModelRaw(groupJpa)
-            else -> GroupEntityJpa.toModelRaw(groupJpa)
+            GroupRaw::class -> groupJpa.toModelRaw()
+            else -> groupJpa.toModelRaw()
         }
         }
     }
@@ -36,7 +36,7 @@ class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<For
     override fun save(groupCreation: GroupCreation): IO<GroupRaw> {
         return IO {
             val group = groupJpa.save(GroupEntityJpa.fromCreation(groupCreation))
-            GroupEntityJpa.toModelRaw(group)
+            group.toModelRaw()
         }
     }
 

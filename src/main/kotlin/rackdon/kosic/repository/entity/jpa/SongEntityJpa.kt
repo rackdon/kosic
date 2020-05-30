@@ -33,6 +33,41 @@ data class SongEntityJpa(
         @Type(type = "jsonb")
         val meta: Map<String, Any> = emptyMap()
 ) {
+    fun toModelRaw() =
+        SongRaw(
+            id = this.id,
+            name = this.name,
+            albumId = this.album.id,
+            duration = this.duration.toUInt(),
+            createdOn = this.createdOn,
+            meta = this.meta)
+
+    fun toModelBase() =
+        SongBase(
+            name = this.name,
+            duration = this.duration.toUInt(),
+            createdOn = this.createdOn,
+            meta = this.meta)
+
+    fun toModelWithAlbum() =
+        SongWithAlbum(
+            id = this.id,
+            name = this.name,
+            album = this.album.toModelRaw(),
+            duration = this.duration.toUInt(),
+            createdOn = this.createdOn,
+            meta = this.meta)
+
+    fun toModelWithAlbumAndGroup() =
+        SongWithAlbumAndGroup(
+            id = this.id,
+            name = this.name,
+            album = this.album.toModelRaw(),
+            group = this.album.group.toModelRaw(),
+            duration = this.duration.toUInt(),
+            createdOn = this.createdOn,
+            meta = this.meta)
+
     companion object {
         fun fromCreation(songCreation: SongCreation, albumEntityJpa: AlbumEntityJpa): SongEntityJpa {
             require(songCreation.albumId == albumEntityJpa.id) {
@@ -46,40 +81,5 @@ data class SongEntityJpa(
                     createdOn = songCreation.createdOn,
                     meta = songCreation.meta)
         }
-
-        fun toModelRaw(songEntityJpa: SongEntityJpa) =
-            SongRaw(
-                    id = songEntityJpa.id,
-                    name = songEntityJpa.name,
-                    albumId = songEntityJpa.album.id,
-                    duration = songEntityJpa.duration.toUInt(),
-                    createdOn = songEntityJpa.createdOn,
-                    meta = songEntityJpa.meta)
-
-        fun toModelBase(songEntityJpa: SongEntityJpa) =
-            SongBase(
-                    name = songEntityJpa.name,
-                    duration = songEntityJpa.duration.toUInt(),
-                    createdOn = songEntityJpa.createdOn,
-                    meta = songEntityJpa.meta)
-
-        fun toModelWithAlbum(songEntityJpa: SongEntityJpa) =
-            SongWithAlbum(
-                    id = songEntityJpa.id,
-                    name = songEntityJpa.name,
-                    album = AlbumEntityJpa.toModelRaw(songEntityJpa.album),
-                    duration = songEntityJpa.duration.toUInt(),
-                    createdOn = songEntityJpa.createdOn,
-                    meta = songEntityJpa.meta)
-
-        fun toModelWithAlbumAndGroup(songEntityJpa: SongEntityJpa) =
-            SongWithAlbumAndGroup(
-                    id = songEntityJpa.id,
-                    name = songEntityJpa.name,
-                    album = AlbumEntityJpa.toModelRaw(songEntityJpa.album),
-                    group = GroupEntityJpa.toModelRaw(songEntityJpa.album.group),
-                    duration = songEntityJpa.duration.toUInt(),
-                    createdOn = songEntityJpa.createdOn,
-                    meta = songEntityJpa.meta)
     }
 }
