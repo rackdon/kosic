@@ -1,0 +1,22 @@
+spring:
+  profiles: local-mongo
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+  data:
+    mongodb:
+      authentication-database: admin
+      database: kosic
+      host: localhost
+      port: 27017
+      username: rackdon
+      password: rackdon
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: info

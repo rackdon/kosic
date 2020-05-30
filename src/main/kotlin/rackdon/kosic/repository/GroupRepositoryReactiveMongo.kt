@@ -8,6 +8,7 @@ import arrow.fx.reactor.ForFluxK
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.k
+import org.springframework.context.annotation.Profile
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Group
@@ -20,13 +21,14 @@ import java.util.UUID
 import kotlin.reflect.KClass
 import rackdon.kosic.model.Pagination as ModelPagination
 
-@Repository
+@Profile("test", "mongo", "local-mongo")
 interface GroupMongo : ReactiveMongoRepository<GroupEntityMongo, UUID> {
     fun findByName(name: String): Mono<GroupEntityMongo>
 }
 
-class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) :
-    GroupRepository<ForMonoK, ForFluxK, ForId> {
+@Repository
+@Profile("test", "mongo", "local-mongo")
+class GroupRepositoryReactiveMongo(private val groupMongo: GroupMongo) : GroupRepository<ForMonoK, ForFluxK, ForId> {
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityMongo: GroupEntityMongo) -> Group {
         return { groupMongo -> when (projection) {

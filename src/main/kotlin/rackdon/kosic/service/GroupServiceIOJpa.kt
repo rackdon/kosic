@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Group
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 import kotlin.streams.toList
 
 @Service
+@Profile("test", "jpa", "local-jpa")
 class GroupServiceIOJpa(val groupRepository: GroupRepositoryIOJpa) : GroupService<ForIO> {
 
     override fun createGroup(groupCreation: GroupCreation): IO<GroupRaw> {

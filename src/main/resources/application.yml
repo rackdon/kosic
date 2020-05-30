@@ -21,22 +21,3 @@ logging:
 springdoc:
   api-docs:
     path: /api-docs
-
-spring:
-  datasource:
-    platform: ${JPA_DB_TYPE:postgres}
-    url: ${JPA_DB_URL:}
-    username: ${JPA_DB_USERNAME:}
-    password: ${JPA_DB_PASSWORD:}
-    jpa:
-      show-sql: true
-      generate-ddl: false
-  data:
-    mongodb:
-      authentication-database: ${MONGO_AUTHENTICATION_DB:admin}
-      database: ${MONGO_DB:kosic}
-      host: ${MONGO_DB_HOST:}
-      port: ${MONGO_DB_PORT:}
-      username: ${MONGO_DB_USERNAME:}
-      password: ${MONGO_DB_PASSWORD}
-

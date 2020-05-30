@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import rackdon.kosic.model.Album
 import rackdon.kosic.model.AlbumCreation
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 import kotlin.streams.toList
 
 @Service
+@Profile("test", "jpa", "local-jpa")
 class AlbumServiceIOJpa(private val albumRepository: AlbumRepositoryIOJpa) : AlbumService<ForIO> {
 
     override fun createAlbum(albumCreation: AlbumCreation): IO<AlbumRaw> {

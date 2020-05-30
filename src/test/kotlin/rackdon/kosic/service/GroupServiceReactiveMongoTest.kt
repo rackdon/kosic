@@ -25,7 +25,7 @@ import rackdon.kosic.utils.generator.groupCreation
 import rackdon.kosic.utils.generator.groupRaw
 import java.util.UUID
 
-class GroupServiceReactiveMongoTest: StringSpec() {
+class GroupServiceReactiveMongoTest : StringSpec() {
     override fun isolationMode() = IsolationMode.InstancePerTest
 
     private val groupRepositoryMock = mockk<GroupRepositoryReactiveMongo>()

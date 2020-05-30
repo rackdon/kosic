@@ -1,0 +1,23 @@
+spring:
+  profiles: jpa
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoReactiveRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration
+  datasource:
+    platform: ${JPA_DB_TYPE:postgres}
+    url: ${JPA_DB_URL:}
+    username: ${JPA_DB_USERNAME:}
+    password: ${JPA_DB_PASSWORD:}
+    jpa:
+      show-sql: true
+      generate-ddl: false
+
+logging:
+  level:
+    root: warn
+  exception-conversion-word: "%replace(%xException){'\\n','\u2028'}%nopex"

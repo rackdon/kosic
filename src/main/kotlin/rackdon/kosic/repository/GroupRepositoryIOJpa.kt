@@ -3,6 +3,7 @@ package rackdon.kosic.repository
 import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
+import org.springframework.context.annotation.Profile
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import rackdon.kosic.model.Group
@@ -15,11 +16,13 @@ import kotlin.reflect.KClass
 import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
+@Profile("test", "jpa", "local-jpa")
 interface GroupJpa : JpaRepository<GroupEntityJpa, UUID> {
     fun findByName(name: String): Optional<GroupEntityJpa>
 }
 
 @Repository
+@Profile("test", "jpa", "local-jpa")
 class GroupRepositoryIOJpa(private val groupJpa: GroupJpa) : GroupRepository<ForIO, ForIO, ForPageK> {
 
     private fun getTransformer(projection: KClass<out Group>): (groupEntityJpa: GroupEntityJpa) -> Group {

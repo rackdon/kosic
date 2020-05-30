@@ -3,6 +3,7 @@ package rackdon.kosic.repository
 import arrow.core.Option
 import arrow.fx.ForIO
 import arrow.fx.IO
+import org.springframework.context.annotation.Profile
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 import rackdon.kosic.model.Pagination as ModelPagination
 
 @Repository
+@Profile("test", "jpa", "local-jpa")
 interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
     fun findByName(name: String): Optional<AlbumEntityJpa>
     fun findByGroupId(groupId: UUID, pageRequest: Pageable): Page<AlbumEntityJpa>
@@ -26,6 +28,7 @@ interface AlbumJpa : JpaRepository<AlbumEntityJpa, UUID> {
 }
 
 @Repository
+@Profile("test", "jpa", "local-jpa")
 class AlbumRepositoryIOJpa(private val albumJpa: AlbumJpa, private val groupJpa: GroupJpa) :
     AlbumRepository<ForIO, ForIO, ForPageK> {
 

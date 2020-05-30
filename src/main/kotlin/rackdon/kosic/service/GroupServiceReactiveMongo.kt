@@ -7,6 +7,8 @@ import arrow.fx.extensions.fx
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.k
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Service
 import rackdon.kosic.model.DataWithPages
 import rackdon.kosic.model.Group
 import rackdon.kosic.model.GroupCreation
@@ -21,6 +23,8 @@ import rackdon.kosic.utils.toMonoK
 import java.util.UUID
 import kotlin.reflect.KClass
 
+@Service
+@Profile("test", "mongo", "local-mongo")
 class GroupServiceReactiveMongo(private val groupRepository: GroupRepositoryReactiveMongo) : GroupService<ForMonoK> {
 
     override fun createGroup(groupCreation: GroupCreation): MonoK<GroupRaw> {
@@ -34,8 +38,8 @@ class GroupServiceReactiveMongo(private val groupRepository: GroupRepositoryReac
             val pagination = Pagination().getPagination(page, pageSize, sort, sortDir)
             val groupsIO = groupRepository.findAll(projection, pagination).flux.collectList().k().toIO()
             val groupsCountIO = groupRepository.countAll().toIO()
-            !IO.parMapN(groupsIO, groupsCountIO) {(g, c) ->
-                DataWithPages(g.map { it.value() }, c.toUInt())}
+            !IO.parMapN(groupsIO, groupsCountIO) { (g, c) ->
+                DataWithPages(g.map { it.value() }, c.toUInt()) }
         }.toMonoK()
     }
 

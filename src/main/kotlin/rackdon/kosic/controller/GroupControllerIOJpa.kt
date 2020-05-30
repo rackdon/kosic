@@ -3,6 +3,7 @@ package rackdon.kosic.controller
 import arrow.core.toOption
 import arrow.fx.extensions.io.async.effectMap
 import arrow.integrations.kotlinx.suspendCancellable
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -30,6 +31,7 @@ import java.util.UUID
 import javax.validation.Valid
 
 @RestController
+@Profile("test", "jpa", "local-jpa")
 @RequestMapping("/api/groups")
 class GroupControllerIOJpa(val groupService: GroupServiceIOJpa, val controllerExceptionHandler: ControllerExceptionHandler) :
     GroupController {
